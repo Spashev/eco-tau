@@ -109,8 +109,8 @@ USE_I18N = True
 
 USE_TZ = True
 
-MEDIA_URL = '/mediafiles/'
-MEDIA_ROOT = BASE_DIR / 'mediafiles'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 USE_S3 = os.getenv('USE_S3') == 'True'
@@ -125,7 +125,7 @@ if USE_S3:
     AWS_LOCATION = 'static'
     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 else:
-    STATIC_URL = '/staticfiles/'
+    STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

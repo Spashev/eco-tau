@@ -33,8 +33,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - media:/code/mediafiles
-      - static:/code/staticfiles
+      - media:/code/media
+      - static:/code/static
       - ./app:/code
     depends_on:
       - redis

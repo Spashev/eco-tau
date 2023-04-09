@@ -19,7 +19,6 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends screen \
   && apt-get clean
 
-# Set python requirements
 WORKDIR /code
 
 COPY app /code
@@ -30,7 +29,6 @@ RUN pip install uvicorn
 RUN pip install psycopg2
 RUN pip install flake8
 RUN pip install pytest-django
-RUN mkdir static
 
 EXPOSE 8000
 
