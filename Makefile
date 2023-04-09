@@ -57,7 +57,7 @@ destroy: ## Stop and remove all containers, networks, images, and volumes
 
 collectstatic: ## Collectstatic
 	${APP} python manage.py collectstatic --noinput
-	${APP} chown -R $(CURRENT_UID):$(CURRENT_GID) staticfiles
+	${APP} chown -R $(CURRENT_UID):$(CURRENT_GID) static
 	@echo ">>> Controller done!"
 
 makemigrations: ## Make migrations
