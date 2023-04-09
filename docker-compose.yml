@@ -1,0 +1,113 @@
+version: "3.0"
+
+# http://localhost:15670/  - rabit
+# http://localhost:8000/  - super-app_api
+
+services:
+
+  database:
+    image: postgres:15.0-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql-core/data/
+    env_file:
+      - ./docker/.env
+    networks:
+      - super-app
+    ports:
+      - "5430:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    tty: true
+    image: super-app
+    restart: always
+#    command: "uvicorn core.asgi:application --host 0.0.0.0 --port 8000"
+    command: "python manage.py runserver 0.0.0.0:8000"
+    networks:
+      - super-app
+    env_file:
+      - ./docker/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - media:/code/mediafiles
+      - static:/code/staticfiles
+      - ./app:/code
+    depends_on:
+      - redis
+      - database
+      - rabbit
+
+  rabbit:
+    image: rabbitmq:management-alpine
+    hostname: core-rabbit
+    restart: always
+    networks:
+      - super-app
+    ports:
+      - "15670:15672"
+      - "5670:5672"
+
+  redis:
+    restart: always
+    image: redis:alpine
+    hostname: core-redis
+    networks:
+      - super-app
+    ports:
+      - "6370:6379"
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    hostname: worker
+    entrypoint: celery
+    command: -A core worker --loglevel=INFO
+    env_file:
+      - ./docker/.env
+    volumes:
+      - ./app:/code
+    depends_on:
+      - redis
+      - database
+      - rabbit
+
+  memcached:
+    image: memcached:alpine
+    restart: always
+    hostname: core-memcached
+    networks:
+      - super-app
+    ports:
+      - "11210:11211"
+
+  mailhog:
+    image: teawithfruit/mailhog
+    hostname: core-mailhog
+    networks:
+      - super-app
+    ports:
+      - "1020:1025"
+      - "8020:8025"
+
+#  nginx:
+#    build: ./nginx
+#    volumes:
+#      - staticfiles:/staticfiles
+#    ports:
+#      - "80:80"
+#    depends_on:
+#      - app
+
+volumes:
+  postgres_data:
+  media:
+  static:
+
+networks:
+  super-app:
+    driver: bridge

@@ -1,0 +1,17 @@
+.idea/
+
+# Created by https://www.gitignore.io/api/macos,linux,django,python,pycharm
+
+### Django ###
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+media
+
+# virtualenv
+.venv
+venv/
+ENV/
