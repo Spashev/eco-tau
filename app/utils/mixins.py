@@ -1,24 +1,14 @@
 from rest_framework import permissions, filters
-from orders.models import Order
 from utils.permissions import AuthorOrReadOnly
 
 from django_filters import rest_framework
 
-
-class OrderQuerySetMixin:
-    model = Order
-    queryset = Order.objects.all()
-    filter_backends = (rest_framework.DjangoFilterBackend, filters.SearchFilter)
-    search_fields = ['project_code', 'user__username', 'user__email', 'status']
-
-    def get_queryset_filter(self, queryset):
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+import uuid
+from PIL import Image
+from io import BytesIO
+from django.core.files import File
+from django.core.files.base import ContentFile
+from django.db import models
 
 
 class UserQuerySetMixin:
@@ -32,3 +22,19 @@ class UserQuerySetMixin:
         if not self.allow_staff_view and not user.is_staff:
             return qs
         return qs.filter(**lookup_data)
+
+
+class ResizeImageMixin:
+    def resize(self, imageField: models.ImageField, size: tuple):
+        im = Image.open(imageField)  # Catch original
+        source_image = im.convert('RGB')
+        source_image.thumbnail(size)  # Resize to size
+        output = BytesIO()
+        source_image.save(output, format='JPEG')  # Save resize image to bytes
+        output.seek(0)
+
+        content_file = ContentFile(output.read())  # Read output and create ContentFile in memory
+        file = File(content_file)
+
+        random_name = f'{uuid.uuid4()}.jpeg'
+        imageField.save(random_name, file, save=False)

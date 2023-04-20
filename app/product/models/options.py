@@ -1,11 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from imagekit.processors import ResizeToFill
-from django_resized import ResizedImageField
 from django.utils.safestring import mark_safe
+from PIL import Image as PILImage
 import uuid
 
 from utils.models import TimestampMixin, CharNameModel
+from utils.mixins import ResizeImageMixin
 
 
 class Category(CharNameModel, models.Model):
@@ -46,9 +47,9 @@ class Type(CharNameModel, TimestampMixin, models.Model):
         return self.name
 
 
-class Image(models.Model):
-    original = models.ImageField(verbose_name=_('Оригинальная картина'), upload_to='images/original/%Y/%m/%d')
-    thumbnail = ResizedImageField(size=[324, 300], quality=75, upload_to='images/thumbnail/%Y/%m/%d', null=True)
+class Image(models.Model, ResizeImageMixin):
+    original = models.ImageField(verbose_name=_('Оригинальная картина'), upload_to='images/original')
+    thumbnail = models.ImageField(verbose_name=_('Thumbnail картина'), upload_to='images/thumbnail', null=True)
     product = models.ForeignKey('product.Product', verbose_name=_('Продукт'), related_name='images',
                                 on_delete=models.CASCADE, null=True, blank=True)
     class Meta:
@@ -71,3 +72,9 @@ class Image(models.Model):
             return mark_safe('<img src="{}" height="50"/>'.format(self.original.url))
         else:
             return ""
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.resize(self.thumbnail, (324, 300))
+
+        super().save(*args, **kwargs)

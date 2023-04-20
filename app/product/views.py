@@ -61,9 +61,10 @@ class ProductViewSet(
         for file in uploaded_files:
             if file.content_type != 'image/png' and file.content_type != 'image/jpeg' \
                     and file.content_type != 'image/jpg' and file.content_type != 'image/gif':
-                raise serializers.ValidationError({'uploaded_files': ['Неверный формат файла']})
+                return Response({'uploaded_files': 'Неверный формат файла'}, status=status.HTTP_400_BAD_REQUEST)
         for file in uploaded_files:
             original_path = default_storage.save(f'images/original/{time.time()}.jpg', ContentFile(file.read()))
+            file.seek(0)
             thumbnail_path = default_storage.save(f'images/thumbnail/{time.time()}.jpg', ContentFile(file.read()))
             Image.objects.create(product=product, original=original_path, thumbnail=thumbnail_path)
 
