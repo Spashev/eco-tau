@@ -1,9 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+from django_resized import ResizedImageField
 from django.utils.safestring import mark_safe
-from PIL import Image as PILImage
 import uuid
 
 from utils.models import TimestampMixin, CharNameModel
@@ -49,11 +48,9 @@ class Type(CharNameModel, TimestampMixin, models.Model):
 
 class Image(models.Model):
     original = models.ImageField(verbose_name=_('Оригинальная картина'), upload_to='images/original/%Y/%m/%d')
-    thumbnail = models.ImageField(verbose_name=_('Сжатая картина'), upload_to='images/thumbnail/%Y/%m/%d', null=True,
-                           blank=True)
+    thumbnail = ResizedImageField(size=[324, 300], quality=75, upload_to='images/thumbnail/%Y/%m/%d', null=True)
     product = models.ForeignKey('product.Product', verbose_name=_('Продукт'), related_name='images',
                                 on_delete=models.CASCADE, null=True, blank=True)
-
     class Meta:
         ordering = ("-pk",)
         verbose_name = _('Картинка продукта')

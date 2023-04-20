@@ -12,5 +12,3 @@ class ProductPermissions(permissions.DjangoModelPermissions):
             return True
         return False
 
-    def has_permission(self, request, view):
-        return True

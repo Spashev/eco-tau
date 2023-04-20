@@ -56,7 +56,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'phone_number',
-            'account_type',
             'is_active',
         )
         read_only_fields = ['id']
