@@ -4,7 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from account import RoleType, UserAccountType
+from account import RoleType
 from account.models import User
 
 
@@ -43,7 +43,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance: User = User.objects.create_user(**validated_data)
         instance.role = RoleType.CLIENT
-        instance.account_type = UserAccountType.CLIENT
         return instance
 
 

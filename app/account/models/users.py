@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 from phonenumber_field.modelfields import PhoneNumberField
 
-from account import UserAccountType, RoleType
+from account import RoleType
 from account.models.managers import UserManager
 from account.tasks import send_password_reset_notification
 
@@ -24,8 +24,6 @@ class User(
     first_name = models.CharField(verbose_name=_("Имя"), max_length=100)
     last_name = models.CharField(verbose_name=_("Фамилия"), max_length=100, blank=True, null=True)
     middle_name = models.CharField(verbose_name=_("Отчество"), max_length=100, blank=True)
-    account_type = models.CharField(verbose_name=_("Тип аккаунта"), max_length=32, choices=UserAccountType.choices,
-                                    default=UserAccountType.CLIENT)
     phone_number = PhoneNumberField(unique=True, null=True, blank=True)
     avatar = models.ImageField(upload_to='avatar/', blank=True, null=True)
     iin = models.CharField(verbose_name='ИИН', max_length=12, blank=True, null=True)

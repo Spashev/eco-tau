@@ -2,7 +2,6 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 
-from account import UserAccountType
 from account.tasks import send_created_account_notification
 from django.conf import settings
 from utils.logger import log_exception
@@ -24,7 +23,6 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_admin', True)
         extra_fields.setdefault('is_active', True)
-        extra_fields.setdefault('account_type', UserAccountType.ADMIN)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError(_('account.custom_user_manager.value_error.not_staff'))

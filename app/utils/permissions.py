@@ -1,7 +1,5 @@
 from rest_framework import permissions
 
-from account import UserAccountType
-
 
 class AuthorOrReadOnly(permissions.BasePermission):
 
