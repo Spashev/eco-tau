@@ -1,12 +1,7 @@
-import os
-import time
 from django.shortcuts import render
 from rest_framework import viewsets, mixins, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from django.conf import settings
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer
@@ -63,10 +58,7 @@ class ProductViewSet(
                     and file.content_type != 'image/jpg' and file.content_type != 'image/gif':
                 return Response({'uploaded_files': 'Неверный формат файла'}, status=status.HTTP_400_BAD_REQUEST)
         for file in uploaded_files:
-            original_path = default_storage.save(f'images/original/{time.time()}.jpg', ContentFile(file.read()))
-            file.seek(0)
-            thumbnail_path = default_storage.save(f'images/thumbnail/{time.time()}.jpg', ContentFile(file.read()))
-            Image.objects.create(product=product, original=original_path, thumbnail=thumbnail_path)
+            Image.objects.create(product=product, original=file, thumbnail=file)
 
         return Response({'message': 'Images saved success'}, status=status.HTTP_200_OK)
 
