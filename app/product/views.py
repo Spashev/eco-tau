@@ -19,7 +19,7 @@ class ProductViewSet(
     viewsets.GenericViewSet
 ):
     serializer_class = ProductListSerializer
-    permission_classes = (ProductPermissions, permissions.IsAuthenticatedOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, ProductPermissions)
     filterset_class = ProductFilterSet
     queryset = Product.active_objects.all()
 
