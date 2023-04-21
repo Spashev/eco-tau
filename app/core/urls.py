@@ -7,7 +7,7 @@ from core.swagger import swagger_patterns
 
 urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
-    path('sapi/v1/wagger/', include(swagger_patterns)),
+    path('api/v1/swagger/', include(swagger_patterns)),
 
     path('admin/', admin.site.urls),
 
