@@ -9,7 +9,11 @@ from utils.serializers import ImageSerializer
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = (
+            'id',
+            'name',
+            'parent'
+        )
 
 
 class ConvenienceSerializer(serializers.ModelSerializer):

@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
-    ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer
-from product.models import Product, Booking, Image
+    ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer
+from product.models import Product, Booking, Image, Category
 from product.filters import ProductFilterSet, BookingFilterSet
 from product.permissions import ProductPermissions
 from utils.permissions import AuthorOrReadOnly
@@ -79,3 +79,12 @@ class BookingViewSet(
         serializer = self.serializer_class
 
         return serializer
+
+
+class CategoryViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = CategorySerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    queryset = Category.objects.all()
