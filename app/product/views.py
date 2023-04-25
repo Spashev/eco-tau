@@ -11,7 +11,6 @@ from product.permissions import ProductPermissions
 from utils.permissions import AuthorOrReadOnly
 
 class ProductViewSet(
-    mixins.ListModelMixin,
     mixins.UpdateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
@@ -61,6 +60,17 @@ class ProductViewSet(
             Image.objects.create(product=product, original=file, thumbnail=file)
 
         return Response({'message': 'Images saved success'}, status=status.HTTP_200_OK)
+
+
+class ProductListViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = ProductListSerializer
+    authentication_classes = []
+    permission_classes = []
+    filterset_class = ProductFilterSet
+    queryset = Product.active_objects.all()
 
 
 class BookingViewSet(
