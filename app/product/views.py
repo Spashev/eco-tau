@@ -12,7 +12,6 @@ from utils.permissions import AuthorOrReadOnly
 
 class ProductViewSet(
     mixins.UpdateModelMixin,
-    mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
@@ -64,6 +63,7 @@ class ProductViewSet(
 
 class ProductListViewSet(
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
     serializer_class = ProductListSerializer
@@ -71,6 +71,13 @@ class ProductListViewSet(
     permission_classes = []
     filterset_class = ProductFilterSet
     queryset = Product.active_objects.all()
+
+    def get_serializer_class(self):
+        serializer = self.serializer_class
+        if self.action == 'retrieve':
+            serializer = ProductRetrieveSerializer
+
+        return serializer
 
 
 class BookingViewSet(
