@@ -16,8 +16,6 @@ class ListUserSerializer(serializers.ModelSerializer):
             'email',
             'full_name',
             'phone_number',
-            'is_active',
-            'role'
         )
         read_only_fields = ['id']
 
@@ -34,14 +32,13 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'phone_number',
-            'password',
-            'role'
+            'password'
         )
         read_only_fields = ['id']
 
     @transaction.atomic
     def create(self, validated_data):
-        instance: User = User.objects.create_user(**validated_data)
+        instance: User = User.objects.create_user(**validated_data, role=RoleType.CLIENT)
         instance.role = RoleType.CLIENT
         return instance
 
