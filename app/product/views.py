@@ -24,8 +24,6 @@ class ProductViewSet(
         serializer = self.serializer_class
         if self.action == 'create':
             serializer = ProductCreateSerializer
-        elif self.action == 'retrieve':
-            serializer = ProductRetrieveSerializer
         elif self.action == 'like':
             serializer = ProductLikeSerializer
         elif self.action == 'save_image':
