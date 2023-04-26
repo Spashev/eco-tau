@@ -1,7 +1,9 @@
 from django.shortcuts import render
-from rest_framework import viewsets, mixins, permissions, status, filters
+from rest_framework import viewsets, mixins, permissions, status, filters, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from django.shortcuts import get_object_or_404
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer
@@ -59,10 +61,24 @@ class ProductViewSet(
         return Response({'message': 'Images saved success'}, status=status.HTTP_200_OK)
 
 
+class ProductRetrieveViewSet(
+    generics.GenericAPIView
+):
+    serializer_class = ProductRetrieveSerializer
+    authentication_classes = []
+    permission_classes = []
+    filterset_class = ProductFilterSet
+    queryset = Product.active_objects.all()
+
+    def get(self, request, pk, *args, **kwargs):
+        product = get_object_or_404(Product, pk=pk)
+        serializer = ProductRetrieveSerializer(product)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class ProductListViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet
+    generics.GenericAPIView
 ):
     serializer_class = ProductListSerializer
     authentication_classes = []
@@ -70,12 +86,15 @@ class ProductListViewSet(
     filterset_class = ProductFilterSet
     queryset = Product.active_objects.all()
 
-    def get_serializer_class(self):
-        serializer = self.serializer_class
-        if self.action == 'retrieve':
-            serializer = ProductRetrieveSerializer
+    def get(self, request, *args, **kwargs):
+        products = Product.active_objects.all()
+        paginator = PageNumberPagination()
+        paginator.page_size = 25
+        result_page = paginator.paginate_queryset(products, request)
+        serializer = ProductListSerializer(result_page, many=True)
 
-        return serializer
+        return paginator.get_paginated_response(serializer.data)
+
 
 
 class BookingViewSet(
