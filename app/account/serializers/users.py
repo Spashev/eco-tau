@@ -4,8 +4,9 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from account import RoleType
+from account import RoleType, RoleClientManagerType
 from account.models import User
+from utils.serializers import ChoiceField
 
 
 class ListUserSerializer(serializers.ModelSerializer):
@@ -22,6 +23,7 @@ class ListUserSerializer(serializers.ModelSerializer):
 
 class CreateUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    role = ChoiceField(choices=RoleClientManagerType)
 
     class Meta:
         model = User
@@ -32,13 +34,15 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'phone_number',
-            'password'
+            'password',
+            'role'
         )
         read_only_fields = ['id']
 
     @transaction.atomic
     def create(self, validated_data):
-        instance: User = User.objects.create_user(**validated_data, role=RoleType.CLIENT)
+        role = validated_data.pop('role') if validated_data.get('role', None) else RoleType.CLIENT
+        instance: User = User.objects.create_user(**validated_data, role=role)
         instance.role = RoleType.CLIENT
         return instance
 

@@ -6,3 +6,8 @@ class RoleType(TextChoices):
     DIRECTOR = 'DIRECTOR', 'Директор'
     CLIENT = 'CLIENT', 'Клиент'
     ADMIN = 'ADMIN', 'Админ'
+
+
+class RoleClientManagerType(TextChoices):
+    CLIENT = 'CLIENT', 'Клиент'
+    MANAGER = 'MANAGER', 'Менеджер'
