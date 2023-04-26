@@ -15,6 +15,7 @@ from utils.permissions import AuthorOrReadOnly
 class ProductViewSet(
     mixins.UpdateModelMixin,
     mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
     serializer_class = ProductListSerializer
