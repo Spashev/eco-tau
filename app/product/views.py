@@ -72,10 +72,12 @@ class ProductRetrieveViewSet(
     queryset = Product.active_objects.all()
 
     def get(self, request, pk, *args, **kwargs):
-        product = get_object_or_404(Product, pk=pk)
-        serializer = ProductRetrieveSerializer(product)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            product = Product.active_objects.get(pk=pk)
+            serializer = ProductRetrieveSerializer(product)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response([], status=status.HTTP_200_OK)
 
 
 class ProductListViewSet(
