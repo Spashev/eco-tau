@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer
@@ -77,7 +78,7 @@ class ProductRetrieveViewSet(
             serializer = ProductRetrieveSerializer(product)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response([], status=status.HTTP_200_OK)
+            raise Http404
 
 
 class ProductListViewSet(
