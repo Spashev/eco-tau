@@ -12,6 +12,7 @@ from utils.mixins import ResizeImageMixin
 class Category(CharNameModel, models.Model):
     is_active = models.BooleanField(verbose_name=_('Активный'), default=True)
     parent = models.ForeignKey('Category', related_name='categories', on_delete=models.PROTECT, null=True, blank=True)
+    icon = models.CharField(verbose_name=_('Иконки'), max_length=255, null=True, blank=True)
 
     class Meta:
         ordering = ("-pk",)
