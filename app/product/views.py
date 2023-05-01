@@ -104,6 +104,7 @@ class ProductListViewSet(
 class BookingViewSet(
     mixins.ListModelMixin,
     mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
@@ -111,7 +112,6 @@ class BookingViewSet(
     authentication_classes = []
     permission_classes = []
     serializer_class = BookingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     filterset_class = BookingFilterSet
     queryset = Booking.objects.all()
 
