@@ -33,11 +33,12 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
     convenience = ConvenienceSerializer(many=True, read_only=True)
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
-    bookings = BookingSerializer(many=True, read_only=True)
+    booking = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = (
+            'id',
             'name',
             'price_per_night',
             'price_per_week',
@@ -58,8 +59,14 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
             'images',
             'latitude',
             'longitude',
-            'bookings',
+            'booking'
         )
+
+    def get_booking(self, obj):
+        bookings = obj.booking_set.all()
+        serializer = BookingSerializer(bookings, many=True)
+
+        return serializer.data
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -71,6 +78,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
+            'id',
             'name',
             'price_per_night',
             'price_per_week',

@@ -5,4 +5,7 @@ from product.models import Booking
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
-        fields = '__all__'
+        fields = (
+            'start_date',
+            'end_date'
+        )

@@ -88,7 +88,7 @@ class ProductListViewSet(
     authentication_classes = []
     permission_classes = []
     filterset_class = ProductFilterSet
-    queryset = Product.active_objects.all()
+    queryset = Product.active_objects.prefetch_related('booking_set').all()
 
     def get(self, request, *args, **kwargs):
         products = Product.active_objects.all()
@@ -102,7 +102,6 @@ class ProductListViewSet(
 
 
 class BookingViewSet(
-    mixins.ListModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     mixins.RetrieveModelMixin,
