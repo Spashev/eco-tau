@@ -55,8 +55,8 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
             'convenience',
             'type',
             'images',
-            'latitude',
-            'longitude',
+            'lat',
+            'lng',
             'booking'
         )
 
@@ -91,8 +91,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             'address',
             'type',
             'images',
-            'latitude',
-            'longitude'
+            'lat',
+            'lng'
         )
 
 
@@ -119,7 +119,9 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             'city',
             'address',
             'convenience',
-            'type'
+            'type',
+            'lat',
+            'lng'
         )
 
         read_only_fields = (

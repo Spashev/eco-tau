@@ -10,7 +10,7 @@ from drf_yasg import openapi, utils
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer
 from product.models import Product, Booking, Image, Category
-from product.filters import ProductFilterSet, BookingFilterSet
+from product.filters import BookingFilterSet
 from product.permissions import ProductPermissions
 from utils.permissions import AuthorOrReadOnly
 
@@ -25,7 +25,6 @@ class ProductViewSet(
 ):
     serializer_class = ProductListSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, ProductPermissions)
-    filterset_class = ProductFilterSet
     queryset = Product.active_objects.all()
 
     def get_serializer_class(self):
@@ -73,7 +72,6 @@ class ProductRetrieveViewSet(
     serializer_class = ProductRetrieveSerializer
     authentication_classes = []
     permission_classes = []
-    filterset_class = ProductFilterSet
     queryset = Product.active_objects.all()
 
     def get(self, request, pk, *args, **kwargs):
@@ -91,7 +89,6 @@ class ProductListViewSet(
     serializer_class = ProductListSerializer
     authentication_classes = []
     permission_classes = []
-    filterset_class = ProductFilterSet
     queryset = Product.active_objects.prefetch_related('booking_set').all()
 
     def get(self, request, *args, **kwargs):
