@@ -61,11 +61,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ['id']
 
-    def update(self, instance, validated_data):
-        instance.update(**validated_data)
-
-        return instance
-
 
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.CharField(write_only=True)

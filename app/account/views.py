@@ -32,6 +32,8 @@ class UserViewSet(
             serializer = ResetPasswordSerializer
         elif self.action == 'update':
             serializer = UpdateUserSerializer
+        elif self.action == 'partial_update':
+            serializer = UpdateUserSerializer
 
         return serializer
 
