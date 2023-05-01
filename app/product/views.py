@@ -108,6 +108,8 @@ class BookingViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
+    authentication_classes = []
+    permission_classes = []
     serializer_class = BookingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     filterset_class = BookingFilterSet
@@ -123,6 +125,7 @@ class CategoryViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
+    authentication_classes = []
+    permission_classes = []
     serializer_class = CategorySerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Category.objects.all()
