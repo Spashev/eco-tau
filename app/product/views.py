@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from drf_yasg import openapi, utils
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer
@@ -12,6 +13,9 @@ from product.models import Product, Booking, Image, Category
 from product.filters import ProductFilterSet, BookingFilterSet
 from product.permissions import ProductPermissions
 from utils.permissions import AuthorOrReadOnly
+
+category = openapi.Parameter('category', openapi.IN_QUERY, description="Category", type=openapi.TYPE_INTEGER)
+
 
 class ProductViewSet(
     mixins.UpdateModelMixin,
@@ -99,6 +103,28 @@ class ProductListViewSet(
 
         return paginator.get_paginated_response(serializer.data)
 
+class CategoryProductListViewSet(
+    generics.GenericAPIView
+):
+    queryset = Product.active_objects.prefetch_related('booking_set').all()
+    serializer_class = ProductListSerializer
+    authentication_classes = []
+    permission_classes = []
+
+    @utils.swagger_auto_schema(manual_parameters=[category])
+    def get(self, request, pk=None, *args, **kwargs):
+        try:
+            pk=request.GET.get('category')
+            category = Category.objects.filter(is_active=True, pk=pk).first()
+            products = category.products.filter(is_active=True)
+            paginator = PageNumberPagination()
+            paginator.page_size = 25
+            result_page = paginator.paginate_queryset(products, request)
+            serializer = ProductListSerializer(result_page, many=True)
+
+            return paginator.get_paginated_response(serializer.data)
+        except Exception as e:
+            raise Http404
 
 
 class BookingViewSet(

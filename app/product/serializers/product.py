@@ -29,7 +29,6 @@ class TypeSerializer(serializers.ModelSerializer):
 
 
 class ProductRetrieveSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(many=True, read_only=True)
     convenience = ConvenienceSerializer(many=True, read_only=True)
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
@@ -51,7 +50,6 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
             'toilet_qty',
             'bath_qty',
             'description',
-            'category',
             'city',
             'address',
             'convenience',
@@ -70,8 +68,6 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(many=True, read_only=True)
-    convenience = ConvenienceSerializer(many=True, read_only=True)
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
 
@@ -91,10 +87,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             'toilet_qty',
             'bath_qty',
             'description',
-            'category',
             'city',
             'address',
-            'convenience',
             'type',
             'images',
             'latitude',
