@@ -8,16 +8,17 @@ class ProductFilterSet(rest_filters.FilterSet):
     price_per_month = rest_filters.CharFilter(field_name='price_per_month', lookup_expr='lte')
     name = rest_filters.CharFilter(field_name='name', lookup_expr='icontains')
     address = rest_filters.CharFilter(field_name='address', lookup_expr='icontains')
+    category = rest_filters.NumberFilter(field_name='category__pk')
 
     class Meta:
         model = Product
-        fields = ['price_per_night', 'price_per_week', 'price_per_month', 'name', 'address']
+        fields = ['price_per_night', 'price_per_week', 'price_per_month', 'name', 'address', 'category']
 
 
 class BookingFilterSet(rest_filters.FilterSet):
-    start_date = rest_filters.DateTimeFilter(field_name='start_date', lookup_expr='eq')
-    end_date = rest_filters.DateTimeFilter(field_name='end_date', lookup_expr='eq')
-    product = rest_filters.DateTimeFilter(field_name='product__name', lookup_expr='eq')
+    start_date = rest_filters.DateTimeFilter(field_name='start_date')
+    end_date = rest_filters.DateTimeFilter(field_name='end_date')
+    product = rest_filters.DateTimeFilter(field_name='product__name')
 
     class Meta:
         model = Booking

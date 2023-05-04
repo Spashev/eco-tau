@@ -91,32 +91,8 @@ class ProductListViewSet(
     authentication_classes = []
     permission_classes = []
     filterset_class = ProductFilterSet
-    filterset_fields = ('price_per_night', 'price_per_week', 'price_per_month', 'name', 'address')
+    filterset_fields = ('price_per_night', 'price_per_week', 'price_per_month', 'name', 'address', 'category')
     queryset = Product.active_objects.prefetch_related('booking_set').all()
-
-
-class CategoryProductListViewSet(
-    generics.GenericAPIView
-):
-    queryset = Product.active_objects.prefetch_related('booking_set').all()
-    serializer_class = ProductListSerializer
-    authentication_classes = []
-    permission_classes = []
-
-    @utils.swagger_auto_schema(manual_parameters=[category])
-    def get(self, request, pk=None, *args, **kwargs):
-        try:
-            pk=request.GET.get('category')
-            category = Category.objects.filter(is_active=True, pk=pk).first()
-            products = category.products.filter(is_active=True)
-            paginator = PageNumberPagination()
-            paginator.page_size = 25
-            result_page = paginator.paginate_queryset(products, request)
-            serializer = ProductListSerializer(result_page, many=True)
-
-            return paginator.get_paginated_response(serializer.data)
-        except Exception as e:
-            raise Http404
 
 
 class BookingViewSet(
