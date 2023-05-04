@@ -8,7 +8,7 @@ from django.http import Http404
 from drf_yasg import openapi, utils
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
-    ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer
+    ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, ProductSearchSerializer
 from product.models import Product, Booking, Image, Category
 from product.filters import BookingFilterSet, ProductFilterSet
 from product.permissions import ProductPermissions
@@ -93,6 +93,35 @@ class ProductListViewSet(
     filterset_class = ProductFilterSet
     filterset_fields = ('price_per_night', 'price_per_week', 'price_per_month', 'name', 'address', 'category')
     queryset = Product.active_objects.prefetch_related('booking_set').all()
+
+
+class ProductSearchViewSet(
+    generics.GenericAPIView
+):
+    serializer_class = ProductSearchSerializer
+    authentication_classes = []
+    permission_classes = []
+    queryset = Product.active_objects.prefetch_related('booking_set')
+
+    def post(self, request):
+        queryset = self.get_queryset()
+        name = request.data.get('name', None)
+        owner = request.data.get('owner', None)
+        rooms_qty = request.data.get('rooms_qty', None)
+        guest_qty = request.data.get('guest_qty', None)
+        if name:
+            queryset = queryset.filter(name=name)
+        if owner:
+            queryset = queryset.filter(owner=owner)
+        if rooms_qty:
+            queryset = queryset.filter(rooms_qty=rooms_qty)
+        if guest_qty:
+            queryset = queryset.filter(guest_qty=guest_qty)
+        paginator = PageNumberPagination()
+        paginator.page_size = 25
+        result = paginator.paginate_queryset(queryset, request)
+        serializer = ProductListSerializer(result, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class BookingViewSet(

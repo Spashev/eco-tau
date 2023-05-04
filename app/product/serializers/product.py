@@ -96,6 +96,22 @@ class ProductListSerializer(serializers.ModelSerializer):
         )
 
 
+class ProductSearchSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+    owner = serializers.CharField(required=False)
+    rooms_qty = serializers.IntegerField(required=False)
+    guest_qty = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Product
+        fields = (
+            'name',
+            'owner',
+            'rooms_qty',
+            'guest_qty',
+        )
+
+
 class ProductCreateSerializer(serializers.ModelSerializer):
     owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
