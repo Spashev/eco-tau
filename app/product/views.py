@@ -6,6 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from drf_yasg import openapi, utils
+from django.db.models import Q
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, ProductSearchSerializer
@@ -109,6 +110,8 @@ class ProductSearchViewSet(
         owner = request.data.get('owner', None)
         rooms_qty = request.data.get('rooms_qty', None)
         guest_qty = request.data.get('guest_qty', None)
+        date_start = request.data.get('date_start', None)
+        date_end = request.data.get('date_end', None)
         if name:
             queryset = queryset.filter(name=name)
         if owner:
@@ -117,6 +120,10 @@ class ProductSearchViewSet(
             queryset = queryset.filter(rooms_qty=rooms_qty)
         if guest_qty:
             queryset = queryset.filter(guest_qty=guest_qty)
+        if date_start and date_end:
+            bookings = Booking.objects.filter(Q(start_date__range=(date_start, date_end)) & Q(end_date__range=(date_start, date_end))).values_list(
+                'product__id', flat=True)
+            queryset = queryset.exclude(id__in=bookings)
         paginator = PageNumberPagination()
         paginator.page_size = 25
         result = paginator.paginate_queryset(queryset, request)

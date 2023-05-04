@@ -101,6 +101,8 @@ class ProductSearchSerializer(serializers.ModelSerializer):
     owner = serializers.CharField(required=False)
     rooms_qty = serializers.IntegerField(required=False)
     guest_qty = serializers.IntegerField(required=False)
+    date_start = serializers.DateField(required=False)
+    date_end = serializers.DateField(required=False)
 
     class Meta:
         model = Product
@@ -109,6 +111,8 @@ class ProductSearchSerializer(serializers.ModelSerializer):
             'owner',
             'rooms_qty',
             'guest_qty',
+            'date_start',
+            'date_end'
         )
 
 
