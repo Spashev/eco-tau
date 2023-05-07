@@ -11,8 +11,7 @@ from utils.mixins import ResizeImageMixin
 
 class Category(CharNameModel, models.Model):
     is_active = models.BooleanField(verbose_name=_('Активный'), default=True)
-    parent = models.ForeignKey('Category', related_name='categories', on_delete=models.PROTECT, null=True, blank=True)
-    icon = models.CharField(verbose_name=_('Иконки'), max_length=255, null=True, blank=True)
+    icon = models.FileField(verbose_name=_('Иконки'), upload_to='icons/categories', null=True, blank=True)
 
     class Meta:
         ordering = ("-pk",)
@@ -25,7 +24,7 @@ class Category(CharNameModel, models.Model):
 
 class Convenience(CharNameModel, models.Model):
     is_active = models.BooleanField(verbose_name=_('Активный'), default=True)
-    icon = models.CharField(verbose_name=_('Иконки'), max_length=255, null=True, blank=True)
+    icon = models.FileField(verbose_name=_('Иконки'), upload_to='icons/conveniences', null=True, blank=True)
     parent = models.ForeignKey('Convenience', related_name='conveniences', on_delete=models.PROTECT, null=True,
                                blank=True)
 
@@ -49,8 +48,12 @@ class Type(CharNameModel, TimestampMixin, models.Model):
 
 
 class Image(models.Model, ResizeImageMixin):
-    original = models.ImageField(verbose_name=_('Оригинальная картина'), upload_to='images/original')
-    thumbnail = models.ImageField(verbose_name=_('Thumbnail картина'), upload_to='images/thumbnail', null=True)
+    original = models.ImageField(verbose_name=_('Оригинальная картина'), upload_to='images/original/%Y/%m/%d')
+    thumbnail = models.ImageField(verbose_name=_('Thumbnail картина'), upload_to='images/thumbnail/%Y/%m/%d', null=True)
+    width = models.IntegerField(verbose_name=_('Width'), blank=True, null=True)
+    height = models.IntegerField(verbose_name=_('Height'), blank=True, null=True)
+    mimetype = models.CharField(max_length=300, default=None, blank=True, null=True)
+    size = models.IntegerField(default=None, blank=True, null=True)
     product = models.ForeignKey('product.Product', verbose_name=_('Продукт'), related_name='images',
                                 on_delete=models.CASCADE, null=True, blank=True)
     class Meta:
@@ -61,9 +64,8 @@ class Image(models.Model, ResizeImageMixin):
     def clean_original(self):
         image = self.cleaned_data.get('original', False)
         if image:
-            if image._size > 4 * 1024 * 1024:
+            if image.size > 4 * 1024 * 1024:
                 raise ValidationError("Image file too large ( > 4mb )")
-
             return image
         else:
             raise ValidationError("Couldn't read uploaded image")
@@ -76,6 +78,8 @@ class Image(models.Model, ResizeImageMixin):
 
     def save(self, *args, **kwargs):
         if self.pk is None:
-            self.resize(self.thumbnail, (324, 300))
-
+            width, height, mime_type = self.resize(self.thumbnail, (324, 300))
+            self.width = width
+            self.height = height
+            self.mimetype = mime_type
         super().save(*args, **kwargs)

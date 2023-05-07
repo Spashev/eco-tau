@@ -42,8 +42,12 @@ class CreateUserSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         role = validated_data.pop('role') if validated_data.get('role', None) else RoleType.CLIENT
-        instance: User = User.objects.create_user(**validated_data, role=role)
-        instance.role = RoleType.CLIENT
+        if role == RoleType.MANAGER:
+            instance: User = User.objects.create_user(**validated_data, role=role, is_staff=True)
+            instance.role = RoleType.MANAGER
+        else:
+            instance: User = User.objects.create_user(**validated_data, role=role)
+            instance.role = RoleType.CLIENT
         return instance
 
 

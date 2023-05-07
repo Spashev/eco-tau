@@ -25,16 +25,21 @@ class UserQuerySetMixin:
 
 
 class ResizeImageMixin:
-    def resize(self, imageField: models.ImageField, size: tuple):
-        im = Image.open(imageField)  # Catch original
+    def resize(self, image_field: models.ImageField, size: tuple):
+        im = Image.open(image_field)
+        width, height = im.size
+        mime_type = im.format
+
         source_image = im.convert('RGB')
-        source_image.thumbnail(size)  # Resize to size
+        source_image.thumbnail(size)
         output = BytesIO()
-        source_image.save(output, format='JPEG')  # Save resize image to bytes
+        source_image.save(output, format='JPEG')
         output.seek(0)
 
-        content_file = ContentFile(output.read())  # Read output and create ContentFile in memory
+        content_file = ContentFile(output.read())
         file = File(content_file)
 
         random_name = f'{uuid.uuid4()}.jpeg'
-        imageField.save(random_name, file, save=False)
+        image_field.save(random_name, file, save=False)
+
+        return width, height, mime_type

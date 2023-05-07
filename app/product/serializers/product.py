@@ -12,14 +12,19 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            'parent'
+            'icon'
         )
 
 
 class ConvenienceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Convenience
-        fields = '__all__'
+        fields = (
+            'id',
+            'name',
+            'icon',
+            'parent'
+        )
 
 
 class TypeSerializer(serializers.ModelSerializer):

@@ -23,6 +23,9 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = (
             'original',
             'thumbnail',
+            'width',
+            'height',
+            'mimetype'
         )
 
 

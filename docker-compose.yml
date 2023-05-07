@@ -1,8 +1,7 @@
 version: "3.0"
 
 # http://localhost:15670/  - rabit
-# http://localhost:8000/  - super-app_api
-# http://localhost:8020/  - mailhog
+# http://localhost:8000/api/v1  - api
 
 services:
 
@@ -76,24 +75,6 @@ services:
       - redis
       - database
       - rabbit
-
-  memcached:
-    image: memcached:alpine
-    restart: always
-    hostname: core-memcached
-    networks:
-      - super-app
-    ports:
-      - "11210:11211"
-
-  mailhog:
-    image: teawithfruit/mailhog
-    hostname: core-mailhog
-    networks:
-      - super-app
-    ports:
-      - "1020:1025"
-      - "8020:8025"
 
 #  nginx:
 #    build: ./nginx
