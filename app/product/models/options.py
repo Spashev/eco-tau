@@ -79,6 +79,8 @@ class Image(models.Model, ResizeImageMixin):
     def save(self, *args, **kwargs):
         if self.pk is None:
             width, height, mime_type = self.resize(self.thumbnail, (324, 300))
+            if width < 720 or height < 720:
+                raise ValidationError("Image size(width,height) must be greater than 720px.")
             self.width = width
             self.height = height
             self.mimetype = mime_type

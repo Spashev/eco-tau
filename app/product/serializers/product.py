@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from product.models import Product, Category, Convenience, Type, Image, Like
-from product.serializers.booking import BookingSerializer
+from product.serializers import booking, comment
 
 from utils.serializers import ImageSerializer
 
@@ -38,6 +38,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
     booking = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -62,13 +63,19 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
             'images',
             'lat',
             'lng',
-            'booking'
+            'booking',
+            'comments',
         )
 
     def get_booking(self, obj):
-        bookings = obj.booking_set.all()
-        serializer = BookingSerializer(bookings, many=True)
+        bookings = obj.booking_set.filter(is_active=True)
+        serializer = booking.BookingSerializer(bookings, many=True)
 
+        return serializer.data
+
+    def get_comments(self, obj):
+        comments = obj.product_comments.all()
+        serializer = comment.CommentListSerializer(comments, many=True)
         return serializer.data
 
 

@@ -9,10 +9,11 @@ from drf_yasg import openapi, utils
 from django.db.models import Q
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
-    ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, ProductSearchSerializer
-from product.models import Product, Booking, Image, Category
+    ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
+    ProductSearchSerializer, CommentSerializer
+from product.models import Product, Booking, Image, Category, Comment
 from product.filters import BookingFilterSet, ProductFilterSet
-from product.permissions import ProductPermissions
+from product.permissions import ProductPermissions, CommentPermissions
 from utils.permissions import AuthorOrReadOnly
 
 category = openapi.Parameter('category', openapi.IN_QUERY, description="Category", type=openapi.TYPE_INTEGER)
@@ -121,7 +122,8 @@ class ProductSearchViewSet(
         if guest_qty:
             queryset = queryset.filter(guest_qty=guest_qty)
         if date_start and date_end:
-            bookings = Booking.objects.filter(Q(start_date__range=(date_start, date_end)) & Q(end_date__range=(date_start, date_end))).values_list(
+            bookings = Booking.objects.filter(
+                Q(start_date__range=(date_start, date_end)) & Q(end_date__range=(date_start, date_end))).values_list(
                 'product__id', flat=True)
             queryset = queryset.exclude(id__in=bookings)
         paginator = PageNumberPagination()
@@ -129,6 +131,16 @@ class ProductSearchViewSet(
         result = paginator.paginate_queryset(queryset, request)
         serializer = ProductListSerializer(result, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+
+class CommentViewSet(
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, CommentPermissions)
 
 
 class BookingViewSet(
