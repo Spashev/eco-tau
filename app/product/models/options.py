@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from imagekit.processors import ResizeToFill
 from django.utils.safestring import mark_safe
 from PIL import Image as PILImage
+from django.core.exceptions import ValidationError
 import uuid
 
 from utils.models import TimestampMixin, CharNameModel

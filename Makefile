@@ -79,3 +79,7 @@ lint:  ## Python lint
 createadmin:  ## Create admin user
 	${APP} python manage.py create_admin
 	@echo ">>> Admin created, login: admin@gmail.com password:123"
+
+create_products: ## Create products
+	${APP} python manage.py create_products
+	@echo ">>> Products create"
