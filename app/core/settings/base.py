@@ -29,7 +29,6 @@ THIRD_PARTY_APPS = [
     'phonenumbers',
     'django_db_logger',
     'debug_toolbar',
-    'imagekit',
     'storages',
 ]
 LOCAL_APPS = [
@@ -159,7 +158,7 @@ INTERNAL_IPS = [
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
 
-DJANGORESIZED_DEFAULT_SCALE = 0.5
+DJANGORESIZED_DEFAULT_SCALE = 0.7
 DJANGORESIZED_DEFAULT_QUALITY = 75
 DJANGORESIZED_DEFAULT_KEEP_META = True
 DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
