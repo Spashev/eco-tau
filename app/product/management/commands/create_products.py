@@ -19,11 +19,11 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         try:
             images = [
-                '/code/media/management/images/img1.jpg',
-                '/code/media/management/images/img2.jpg',
-                '/code/media/management/images/img3.jpg',
-                '/code/media/management/images/img4.jpg',
-                '/code/media/management/images/img5.jpg',
+                '/code/product/management/images/img1.jpg',
+                '/code/product/management/images/img2.jpg',
+                '/code/product/management/images/img3.jpg',
+                '/code/product/management/images/img4.jpg',
+                '/code/product/management/images/img5.jpg',
             ]
             for _ in range(5):
                 User.objects.create_user(fake.email(), fake.password(6), role=RoleType.MANAGER)
