@@ -25,13 +25,14 @@ class UserQuerySetMixin:
 
 
 class ResizeImageMixin:
-    def resize(self, image_field: models.ImageField, size: tuple):
+    def resize(self, image_field: models.ImageField, percentage: int = 0.5):
         im = Image.open(image_field)
         width, height = im.size
         mime_type = im.format
 
         source_image = im.convert('RGB')
-        source_image.thumbnail(size)
+        resized_dimensions = (int(width * percentage), int(height * percentage))
+        source_image.thumbnail(resized_dimensions)
         output = BytesIO()
         source_image.save(output, format='JPEG')
         output.seek(0)
@@ -43,3 +44,10 @@ class ResizeImageMixin:
         image_field.save(random_name, file, save=False)
 
         return width, height, mime_type
+
+    # def resize_by_percentage(image, outfile, percentage):
+    #     with Image.open (image) as im:
+    #         width, height = im.size
+    #         resized_dimensions = (int(width * percentage), int(height * percentage))
+    #         resized = im.resize(resized_dimensions)
+    #         resized.save(outfile)

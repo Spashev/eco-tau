@@ -20,8 +20,7 @@ class UserViewSet(
 ):
     queryset = User.objects.all()
     serializer_class = ListUserSerializer
-    filterset_fields = ['email', 'first_name', 'last_name', 'phone_number']
-    authentication_classes = []
+    filterset_fields = ['email']
 
     def get_serializer_class(self):
         serializer = self.serializer_class

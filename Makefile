@@ -33,11 +33,8 @@ build: ## Build docker containers
 	$(DOCKER_COMP) build
 	@echo ">>> Base build done!"
 
-bash: ## Run bash inside superapp container
+shell: ## Run bash inside superapp container
 	${APP} bash
-
-shell: ## Run bash django
-	${APP} python manage.py shell
 
 rebuild: ## Build docker containers without cache
 	$(DOCKER_COMP) build --no-cache

@@ -66,7 +66,9 @@ services:
       dockerfile: docker/Dockerfile
     hostname: worker
     entrypoint: celery
-    command: -A core worker --loglevel=INFO
+    command: -A core worker -c 3 --loglevel=INFO
+    networks:
+      - super-app
     env_file:
       - ./docker/.env
     volumes:
