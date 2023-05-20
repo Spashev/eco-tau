@@ -133,14 +133,19 @@ class ProductSearchViewSet(
             if guest_qty:
                 queryset = queryset.filter(guest_qty=guest_qty)
             if date_start and date_end:
-                bookings = Booking.objects.filter(
-                    Q(start_date__range=(date_start, date_end)) & Q(end_date__range=(date_start, date_end))).values_list(
+                booking_products_id = Booking.objects.filter(
+                    Q(start_date__range=(date_start, date_end)) | Q(end_date__range=(date_start, date_end))
+                    | (Q(start_date__gt=date_start) & Q(end_date__lt=date_start))
+                    | (Q(start_date__gt=date_end) & Q(end_date__lt=date_end))
+                    | (Q(start_date__lt=date_start) & Q(start_date__gt=date_end) & Q(end_date__lt=date_end))
+                    | (Q(end_date__lt=date_end) & Q(start_date__gt=date_start) & Q(end_date__lt=date_start))
+                ).values_list(
                     'product__id', flat=True)
-                queryset = queryset.exclude(id__in=bookings)
+                queryset = queryset.exclude(id__in=booking_products_id)
             paginator = PageNumberPagination()
             paginator.page_size = 25
             result = paginator.paginate_queryset(queryset, request)
-            serializer = ProductListSerializer(result, many=True)
+            serializer = ProductRetrieveSerializer(result, many=True)
             return paginator.get_paginated_response(serializer.data)
         except Exception as e:
             logger.error(f'Search error {str(e)}')
