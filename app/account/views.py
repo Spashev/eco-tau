@@ -1,8 +1,7 @@
 from rest_framework import viewsets, mixins, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-import models
-
+import logging
 from account.models import User
 from account.serializers import (
     ListUserSerializer,
