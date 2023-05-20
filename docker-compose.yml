@@ -1,7 +1,8 @@
 version: "3.0"
 
-# http://localhost:15670/  - rabit
-# http://localhost:8000/api/v1  - api
+# http://localhost:9001/ - minio
+# http://localhost:15670/ - rabit
+# http://localhost:8000/api/v1 - api
 
 services:
 
@@ -40,6 +41,10 @@ services:
       - redis
       - database
       - rabbit
+      - minio
+      - createbucket
+    extra_hosts:
+      - "localhost:172.17.0.1"
 
   rabbit:
     image: rabbitmq:management-alpine
@@ -60,6 +65,38 @@ services:
     ports:
       - "6370:6379"
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - data:/data
+    environment:
+      - "MINIO_ROOT_USER=user"
+      - "MINIO_ROOT_PASSWORD=password"
+    command: server /data --console-address :9001
+    networks:
+      - super-app
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9001/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  createbucket:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add --api s3v4 s3 http://minio:9000 user password;
+      /usr/bin/mc mb s3/static/;
+      /usr/bin/mc anonymous set download s3/static;
+      "
+
   worker:
     build:
       context: .
@@ -77,6 +114,8 @@ services:
       - redis
       - database
       - rabbit
+      - minio
+      - createbucket
 
 #  nginx:
 #    build: ./nginx
@@ -91,6 +130,7 @@ volumes:
   postgres_data:
   media:
   static:
+  data:
 
 networks:
   super-app:

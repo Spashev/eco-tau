@@ -32,6 +32,7 @@ RUN pip install pytest-django
 COPY app/product/management/images /code/media/
 
 EXPOSE 8000
+EXPOSE 9000
 
 COPY docker/start.uvicorn.sh ./
 RUN chmod +x ./start.uvicorn.sh
