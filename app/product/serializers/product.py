@@ -3,7 +3,7 @@ import logging
 from product.models import Product, Category, Convenience, Type, Image, Like
 from product.serializers import booking, comment
 
-from utils.serializers import ImageSerializer
+from utils.serializers import ImageSerializer, UserSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, read_only=True)
     booking = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
+    owner = serializers.CharField(source='owner.full_name')
 
     class Meta:
         model = Product
@@ -70,7 +71,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
         )
 
     def get_booking(self, obj):
-        bookings = obj.booking_set.filter(is_active=True)
+        bookings = obj.booking_set.all()
         serializer = booking.BookingSerializer(bookings, many=True)
 
         return serializer.data
@@ -84,6 +85,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
 class ProductListSerializer(serializers.ModelSerializer):
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
+    owner = UserSerializer()
 
     class Meta:
         model = Product

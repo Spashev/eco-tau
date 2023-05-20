@@ -88,8 +88,10 @@ class ProductRetrieveViewSet(
         try:
             product = Product.active_objects.get(pk=pk)
             serializer = ProductRetrieveSerializer(product)
+            print(serializer.validate)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
+            logger.error(f'Product details {str(e)}')
             raise Http404
 
 
@@ -142,6 +144,7 @@ class ProductSearchViewSet(
             return paginator.get_paginated_response(serializer.data)
         except Exception as e:
             logger.error(f'Search error {str(e)}')
+            raise Http404
 
 
 class CommentViewSet(
