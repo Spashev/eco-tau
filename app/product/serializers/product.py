@@ -1,9 +1,11 @@
 from rest_framework import serializers
-
+import logging
 from product.models import Product, Category, Convenience, Type, Image, Like
 from product.serializers import booking, comment
 
 from utils.serializers import ImageSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -161,13 +163,16 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        category = validated_data.pop('category')
-        convenience = validated_data.pop('convenience')
-        product = Product.objects.create(**validated_data)
-        product.category.set(category)
-        product.convenience.set(convenience)
+        try:
+            category = validated_data.pop('category')
+            convenience = validated_data.pop('convenience')
+            product = Product.objects.create(**validated_data)
+            product.category.set(category)
+            product.convenience.set(convenience)
 
-        return product
+            return product
+        except Exception as e:
+            logger.error(f'Create product error {str(e)}')
 
 
 class ProductLikeSerializer(serializers.ModelSerializer):

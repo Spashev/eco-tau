@@ -114,31 +114,34 @@ class ProductSearchViewSet(
     queryset = Product.active_objects.prefetch_related('booking_set')
 
     def post(self, request):
-        queryset = self.get_queryset()
-        name = request.data.get('name', None)
-        owner = request.data.get('owner', None)
-        rooms_qty = request.data.get('rooms_qty', None)
-        guest_qty = request.data.get('guest_qty', None)
-        date_start = request.data.get('date_start', None)
-        date_end = request.data.get('date_end', None)
-        if name:
-            queryset = queryset.filter(name=name)
-        if owner:
-            queryset = queryset.filter(owner=owner)
-        if rooms_qty:
-            queryset = queryset.filter(rooms_qty=rooms_qty)
-        if guest_qty:
-            queryset = queryset.filter(guest_qty=guest_qty)
-        if date_start and date_end:
-            bookings = Booking.objects.filter(
-                Q(start_date__range=(date_start, date_end)) & Q(end_date__range=(date_start, date_end))).values_list(
-                'product__id', flat=True)
-            queryset = queryset.exclude(id__in=bookings)
-        paginator = PageNumberPagination()
-        paginator.page_size = 25
-        result = paginator.paginate_queryset(queryset, request)
-        serializer = ProductListSerializer(result, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        try:
+            queryset = self.get_queryset()
+            name = request.data.get('name', None)
+            owner = request.data.get('owner', None)
+            rooms_qty = request.data.get('rooms_qty', None)
+            guest_qty = request.data.get('guest_qty', None)
+            date_start = request.data.get('date_start', None)
+            date_end = request.data.get('date_end', None)
+            if name:
+                queryset = queryset.filter(name=name)
+            if owner:
+                queryset = queryset.filter(owner=owner)
+            if rooms_qty:
+                queryset = queryset.filter(rooms_qty=rooms_qty)
+            if guest_qty:
+                queryset = queryset.filter(guest_qty=guest_qty)
+            if date_start and date_end:
+                bookings = Booking.objects.filter(
+                    Q(start_date__range=(date_start, date_end)) & Q(end_date__range=(date_start, date_end))).values_list(
+                    'product__id', flat=True)
+                queryset = queryset.exclude(id__in=bookings)
+            paginator = PageNumberPagination()
+            paginator.page_size = 25
+            result = paginator.paginate_queryset(queryset, request)
+            serializer = ProductListSerializer(result, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        except Exception as e:
+            logger.error(f'Search error {str(e)}')
 
 
 class CommentViewSet(
