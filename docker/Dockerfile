@@ -29,7 +29,7 @@ RUN pip install uvicorn
 RUN pip install psycopg2
 RUN pip install flake8
 RUN pip install pytest-django
-COPY app/media /code/media/
+COPY app/product/management/images /code/media/
 
 EXPOSE 8000
 
