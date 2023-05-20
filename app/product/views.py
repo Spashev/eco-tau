@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 from drf_yasg import openapi, utils
 from django.db.models import Q
+import logging
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
@@ -18,6 +19,7 @@ from utils.permissions import AuthorOrReadOnly
 
 category = openapi.Parameter('category', openapi.IN_QUERY, description="Category", type=openapi.TYPE_INTEGER)
 
+logger = logging.getLogger(__name__)
 
 class ProductViewSet(
     mixins.UpdateModelMixin,
@@ -42,30 +44,36 @@ class ProductViewSet(
 
     @action(detail=True, methods=['put'], url_path='like')
     def like(self, request, pk):
-        obj = self.get_object()
-        user = request.user
-        likes = user.likes.filter(product=obj)
-        if likes:
-            likes.first().delete()
-        else:
-            obj.likes.create(user=user)
-        like_count = obj.likes.count()
+        try:
+            obj = self.get_object()
+            user = request.user
+            likes = user.likes.filter(product=obj)
+            if likes:
+                likes.first().delete()
+            else:
+                obj.likes.create(user=user)
+            like_count = obj.likes.count()
 
-        return Response({'likes': like_count}, status=status.HTTP_200_OK)
+            return Response({'likes': like_count}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f'Save image error {str(e)}')
 
     @action(detail=True, methods=['post'], url_path='images')
     def save_image(self, request, pk):
-        product = self.get_object()
-        data = request.data
-        uploaded_files = data.pop('uploaded_files')
-        for file in uploaded_files:
-            if file.content_type != 'image/png' and file.content_type != 'image/jpeg' \
-                    and file.content_type != 'image/jpg' and file.content_type != 'image/gif':
-                return Response({'uploaded_files': 'Неверный формат файла'}, status=status.HTTP_400_BAD_REQUEST)
-        for file in uploaded_files:
-            Image.objects.create(product=product, original=file, thumbnail=file)
+        try:
+            product = self.get_object()
+            data = request.data
+            uploaded_files = data.pop('uploaded_files')
+            for file in uploaded_files:
+                if file.content_type != 'image/png' and file.content_type != 'image/jpeg' \
+                        and file.content_type != 'image/jpg' and file.content_type != 'image/gif':
+                    return Response({'uploaded_files': 'Неверный формат файла'}, status=status.HTTP_400_BAD_REQUEST)
+            for file in uploaded_files:
+                Image.objects.create(product=product, original=file, thumbnail=file)
 
-        return Response({'message': 'Images saved success'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Images saved success'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f'Save image error {str(e)}')
 
 
 class ProductRetrieveViewSet(

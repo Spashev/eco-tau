@@ -1,7 +1,7 @@
 import os
 import io
-from PIL import Image as PILImage
 import requests
+from PIL import Image as PILImage
 from django.core.files import File
 from django.core.management.base import BaseCommand
 from random import randint, choice
@@ -12,6 +12,7 @@ from account import RoleType
 from product.models import Product, Image, Category, Type, Convenience
 
 fake = Faker()
+
 
 class Command(BaseCommand):
     help = 'Create 100 products'
@@ -25,6 +26,7 @@ class Command(BaseCommand):
                 '/code/product/management/images/img4.jpg',
                 '/code/product/management/images/img5.jpg',
             ]
+            print('Starting create products...')
             for _ in range(5):
                 User.objects.create_user(fake.email(), fake.password(6), role=RoleType.MANAGER)
                 Category.objects.create(name=fake.pystr())
@@ -56,6 +58,7 @@ class Command(BaseCommand):
                 product = Product.objects.create(**data)
                 product.category.set([i for i in range(1, randint(1, 5))])
                 product.convenience.set([i for i in range(1, randint(1, 3))])
+                print(f'Product {_} created')
 
                 for _ in range(5):
                     image_url = choice(images)

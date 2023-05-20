@@ -1,6 +1,7 @@
 from rest_framework import viewsets, mixins, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+import models
 
 from account.models import User
 from account.serializers import (
@@ -10,6 +11,8 @@ from account.serializers import (
     UpdateUserSerializer
 )
 
+
+logger = logging.getLogger(__name__)
 
 class UserViewSet(
     mixins.ListModelMixin,
@@ -44,7 +47,10 @@ class UserViewSet(
 
     @action(methods=['POST'], detail=False, url_path='reset-password')
     def reset_password(self, request, *args, **kwargs) -> Response:
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=200)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(status=200)
+        except Exception as e:
+            logger.error(f'Failed to reset password {str(e)}')
