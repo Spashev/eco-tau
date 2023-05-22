@@ -170,7 +170,7 @@ class BookingViewSet(
     viewsets.GenericViewSet
 ):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = (permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly)
     serializer_class = BookingSerializer
     filterset_class = BookingFilterSet
     queryset = Booking.objects.all()
