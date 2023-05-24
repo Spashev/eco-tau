@@ -1,7 +1,6 @@
 from rest_framework import viewsets, mixins, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-import logging
 from account.models import User
 from account.serializers import (
     ListUserSerializer,
@@ -9,9 +8,8 @@ from account.serializers import (
     ResetPasswordSerializer,
     UpdateUserSerializer
 )
+from utils.logger import log_exception
 
-
-logger = logging.getLogger(__name__)
 
 class UserViewSet(
     mixins.ListModelMixin,
@@ -53,4 +51,4 @@ class UserViewSet(
             serializer.save()
             return Response(status=200)
         except Exception as e:
-            logger.error(f'Failed to reset password {str(e)}')
+            log_exception(e, f'Failed to reset password {str(e)}')

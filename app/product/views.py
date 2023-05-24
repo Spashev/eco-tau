@@ -6,8 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from drf_yasg import openapi, utils
-from django.db.models import Q
-import logging
+from django.db.models import Qlogging
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
@@ -16,10 +15,10 @@ from product.models import Product, Booking, Image, Category, Comment
 from product.filters import BookingFilterSet, ProductFilterSet
 from product.permissions import ProductPermissions, CommentPermissions
 from utils.permissions import AuthorOrReadOnly
+from utils.logger import log_exception
 
 category = openapi.Parameter('category', openapi.IN_QUERY, description="Category", type=openapi.TYPE_INTEGER)
 
-logger = logging.getLogger(__name__)
 
 class ProductViewSet(
     mixins.UpdateModelMixin,
@@ -56,7 +55,8 @@ class ProductViewSet(
 
             return Response({'likes': like_count}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error(f'Save image error {str(e)}')
+            log_exception(e, f'Save image error {str(e)}')
+            raise Http404
 
     @action(detail=True, methods=['post'], url_path='images')
     def save_image(self, request, pk):
@@ -73,7 +73,8 @@ class ProductViewSet(
 
             return Response({'message': 'Images saved success'}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error(f'Save image error {str(e)}')
+            log_exception(e, f'Save image error {str(e)}')
+            raise Http404
 
 
 class ProductRetrieveViewSet(
@@ -91,7 +92,7 @@ class ProductRetrieveViewSet(
             print(serializer.validate)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error(f'Product details {str(e)}')
+            log_exception(e, f'Product details {str(e)}')
             raise Http404
 
 
@@ -148,7 +149,7 @@ class ProductSearchViewSet(
             serializer = ProductRetrieveSerializer(result, many=True)
             return paginator.get_paginated_response(serializer.data)
         except Exception as e:
-            logger.error(f'Search error {str(e)}')
+            log_exception(e, f'Search error {str(e)}')
             raise Http404
 
 

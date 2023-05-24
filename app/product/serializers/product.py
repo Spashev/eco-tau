@@ -1,11 +1,9 @@
 from rest_framework import serializers
-import logging
 from product.models import Product, Category, Convenience, Type, Image, Like
 from product.serializers import booking, comment
 
 from utils.serializers import ImageSerializer, UserSerializer
-
-logger = logging.getLogger(__name__)
+from utils.logger import log_exception
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -174,7 +172,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
             return product
         except Exception as e:
-            logger.error(f'Create product error {str(e)}')
+            log_exception(e, f'Create product error {str(e)}')
 
 
 class ProductLikeSerializer(serializers.ModelSerializer):

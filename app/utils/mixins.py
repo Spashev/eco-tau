@@ -4,14 +4,13 @@ from utils.permissions import AuthorOrReadOnly
 from django_filters import rest_framework
 
 import uuid
-import logging
 from PIL import Image
 from io import BytesIO
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import models
+from utils.logger import log_exception
 
-logger = logging.getLogger(__name__)
 
 class UserQuerySetMixin:
     user_filed = 'user'
@@ -48,11 +47,4 @@ class ResizeImageMixin:
 
             return width, height, mime_type
         except Exception as e:
-            logger.error(f'Failed to resize image {str(e)}')
-
-    # def resize_by_percentage(image, outfile, percentage):
-    #     with Image.open (image) as im:
-    #         width, height = im.size
-    #         resized_dimensions = (int(width * percentage), int(height * percentage))
-    #         resized = im.resize(resized_dimensions)
-    #         resized.save(outfile)
+            log_exception(e, f'Failed to resize image {str(e)}')
