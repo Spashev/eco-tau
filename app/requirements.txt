@@ -22,9 +22,10 @@ ipython==8.7.0
 autopep8==2.0.0
 bcrypt==4.0.1
 django_debug_toolbar==3.8.1
-django-storages==1.13.2
-boto3==1.26.99
 pytest_django==4.5.2
 pytest_metadata==2.0.4
 pytest_factoryboy==2.5.1
 Faker==18.7.0
+boto3
+minio
+django-storages

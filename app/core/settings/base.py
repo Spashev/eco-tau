@@ -115,6 +115,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 USE_S3 = os.getenv('USE_S3') == 'True'
+USE_MINIO = os.getenv('USE_MINIO') == 'True'
+LOCAL = os.getenv('LOCAL') == 'True'
 if USE_S3:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
@@ -128,6 +130,23 @@ if USE_S3:
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.eu-central-1.amazonaws.com'
     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+elif USE_MINIO:
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+
+    MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
+    MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
+    MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
+    MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+
+    AWS_ACCESS_KEY_ID = MINIO_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY = MINIO_SECRET_KEY
+    AWS_STORAGE_BUCKET_NAME = MINIO_BUCKET_NAME
+    AWS_S3_ENDPOINT_URL = MINIO_ENDPOINT
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = True
+    AWS_S3_FILE_OVERWRITE = False
+    STATIC_URL = 'http://localhost:9001/static/'
 else:
     MEDIA_URL = '/media/'
     STATIC_URL = '/static/'

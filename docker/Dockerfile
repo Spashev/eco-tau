@@ -33,6 +33,7 @@ RUN pip install flake8
 RUN pip install pytest-django
 
 EXPOSE 8000
+EXPOSE 9000
 
 COPY docker/start.uvicorn.sh ./
 RUN chmod +x ./start.uvicorn.sh
