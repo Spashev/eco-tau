@@ -81,9 +81,9 @@ services:
       - rabbit
 
 #  nginx:
-#    build: ./nginx
+#    build: docker/nginx
 #    volumes:
-#      - staticfiles:/staticfiles
+#      - static:/static
 #    ports:
 #      - "80:80"
 #    depends_on:
