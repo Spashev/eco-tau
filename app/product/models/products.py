@@ -33,7 +33,7 @@ class Product(CharNameModel, TimestampMixin, models.Model):
     lat = models.CharField(verbose_name='Координата Latitude', max_length=255, null=True, blank=True)
     is_active = models.BooleanField(verbose_name=_('Активный'), default=False)
     priority = models.TextField(choices=Priority.choices, default=Priority.MEDIUM, max_length=50)
-    like_count = models.IntegerField(verbose_name='Likes', default=0)
+    like_count = models.PositiveIntegerField(verbose_name='Likes', default=0)
     comments = models.TextField(verbose_name='Коментарии', null=True, blank=True)
 
     objects = models.Manager()

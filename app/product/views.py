@@ -6,12 +6,12 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from drf_yasg import openapi, utils
-from django.db.models import Qlogging
+from django.db.models import Q
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
     ProductSearchSerializer, CommentSerializer
-from product.models import Product, Booking, Image, Category, Comment
+from product.models import Product, Booking, Image, Category, Comment, Like
 from product.filters import BookingFilterSet, ProductFilterSet
 from product.permissions import ProductPermissions, CommentPermissions
 from utils.permissions import AuthorOrReadOnly
@@ -51,11 +51,10 @@ class ProductViewSet(
                 likes.first().delete()
             else:
                 obj.likes.create(user=user)
-            like_count = obj.likes.count()
 
-            return Response({'likes': like_count}, status=status.HTTP_200_OK)
+            return Response({'message': 'Product liked.'}, status=status.HTTP_200_OK)
         except Exception as e:
-            log_exception(e, f'Save image error {str(e)}')
+            log_exception(e, f'Product like error {str(e)}')
             raise Http404
 
     @action(detail=True, methods=['post'], url_path='images')
