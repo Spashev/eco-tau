@@ -1,4 +1,3 @@
-import pytest
 import factory
 from faker import Faker
 from pytest_factoryboy import register

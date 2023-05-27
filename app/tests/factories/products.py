@@ -1,10 +1,7 @@
-import pytest
 import factory
 from random import randint, choice
 from faker import Faker
 from pytest_factoryboy import register
-from datetime import datetime
-from django.utils import timezone
 from account.models import User
 from product.models import Product
 

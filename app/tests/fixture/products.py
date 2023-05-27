@@ -1,7 +1,7 @@
 import pytest
 from faker import Faker
 
-from product.models import Product, Category, Type, Convenience
+from product.models import Category, Type, Convenience
 
 fake = Faker()
 

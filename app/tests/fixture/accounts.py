@@ -1,8 +1,6 @@
 import pytest
-import json
 from faker import Faker
 
-from account.models import User
 from account import RoleType
 
 from tests.factories.accounts import UserFactory

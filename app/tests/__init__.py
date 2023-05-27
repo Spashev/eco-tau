@@ -1,6 +1,5 @@
 import pytest
 from rest_framework.test import APIClient
-from product.models import Product
 
 from tests.factories.products import ProductFactory
 
@@ -37,11 +36,9 @@ class BaseTestCase:
         self.type_factory = type_factory
         self.convenience_factory = convenience_factory
 
-
     def create_orders_approve(self, count: int = 1):
         for _ in range(count):
             self.__create_product(is_active=True)
-
 
     def __create_product(self, is_active: bool = False):
         return ProductFactory.create(

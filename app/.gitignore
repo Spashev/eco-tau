@@ -213,3 +213,6 @@ ENV/
 
 # End of https://www.gitignore.io/api/macos,linux,django,python,pycharm
 /mediafiles/
+/.pytest_cache/
+/media/
+/static/
