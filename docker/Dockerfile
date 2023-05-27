@@ -22,6 +22,8 @@ RUN apt-get update \
 WORKDIR /code
 
 COPY app /code
+COPY app/product/management/images /code/media/
+
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN pip install Redis
@@ -29,9 +31,9 @@ RUN pip install uvicorn
 RUN pip install psycopg2
 RUN pip install flake8
 RUN pip install pytest-django
-COPY app/product/management/images /code/media/
 
 EXPOSE 8000
+EXPOSE 9000
 
 COPY docker/start.uvicorn.sh ./
 RUN chmod +x ./start.uvicorn.sh

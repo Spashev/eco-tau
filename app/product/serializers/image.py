@@ -1,10 +1,8 @@
 import os
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
 
-from product.models import Product, Image
+from product.models import Image
 from utils.validator import MAX_FILE_SIZE
-from utils.serializers import ImageSerializer
 
 
 class UploadFilesSerializer(serializers.ModelSerializer):

@@ -80,3 +80,7 @@ createadmin:  ## Create admin user
 create_products: ## Create products
 	${APP} python manage.py create_products
 	@echo ">>> Products create"
+
+pytest: ## Run test
+	${APP} pytest -rP
+	@echo ">>> Test done!"

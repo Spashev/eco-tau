@@ -1,11 +1,11 @@
 from rest_framework import serializers
-import logging
-from product.models import Product, Category, Convenience, Type, Image, Like
+from product.models import Product, Category, Convenience, Type, Like
 from product.serializers import booking, comment
+from django.db.models import Sum
+import math
 
-from utils.serializers import ImageSerializer
-
-logger = logging.getLogger(__name__)
+from utils.serializers import ImageSerializer, UserSerializer
+from utils.logger import log_exception
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -41,6 +41,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, read_only=True)
     booking = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
+    owner = serializers.CharField(source='owner.full_name')
 
     class Meta:
         model = Product
@@ -67,10 +68,11 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
             'lng',
             'booking',
             'comments',
+            'like_count',
         )
 
     def get_booking(self, obj):
-        bookings = obj.booking_set.filter(is_active=True)
+        bookings = obj.booking_set.all()
         serializer = booking.BookingSerializer(bookings, many=True)
 
         return serializer.data
@@ -84,6 +86,8 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
 class ProductListSerializer(serializers.ModelSerializer):
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
+    owner = UserSerializer()
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -105,9 +109,15 @@ class ProductListSerializer(serializers.ModelSerializer):
             'address',
             'type',
             'images',
+            'is_active',
+            'rating',
             'lat',
             'lng'
         )
+
+    def get_rating(self, obj):
+        total_likes = Product.objects.aggregate(Sum('like_count'))
+        return math.ceil((int(obj.like_count) / int(total_likes.get('like_count__sum'))) * 100)
 
 
 class ProductSearchSerializer(serializers.ModelSerializer):
@@ -172,7 +182,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
             return product
         except Exception as e:
-            logger.error(f'Create product error {str(e)}')
+            log_exception(e, f'Create product error {str(e)}')
 
 
 class ProductLikeSerializer(serializers.ModelSerializer):

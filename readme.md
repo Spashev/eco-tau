@@ -45,5 +45,5 @@ make collectstatic
 make celery
 ```
 
-Swagger [swagger](http://localhost:8010/swagger/).<br>
-Redoc [docs](http://localhost:8010/swagger/redoc/).
+Swagger [swagger](http://localhost:8000/swagger/).<br>
+Redoc [docs](http://localhost:8000/swagger/redoc/).

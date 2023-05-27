@@ -115,6 +115,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 USE_S3 = os.getenv('USE_S3') == 'True'
+USE_MINIO = os.getenv('USE_MINIO') == 'True'
+LOCAL = os.getenv('LOCAL') == 'True'
 if USE_S3:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
@@ -128,6 +130,23 @@ if USE_S3:
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.eu-central-1.amazonaws.com'
     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+elif USE_MINIO:
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+
+    MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
+    MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
+    MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
+    MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+
+    AWS_ACCESS_KEY_ID = MINIO_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY = MINIO_SECRET_KEY
+    AWS_STORAGE_BUCKET_NAME = MINIO_BUCKET_NAME
+    AWS_S3_ENDPOINT_URL = MINIO_ENDPOINT
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = True
+    AWS_S3_FILE_OVERWRITE = False
+    STATIC_URL = 'http://localhost:9001/static/'
 else:
     MEDIA_URL = '/media/'
     STATIC_URL = '/static/'
@@ -140,8 +159,7 @@ EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-if os.getenv('EMAIL_USE_TLS') == 'True':
-    EMAIL_USE_TLS = True
+EMAIL_USE_TLS = True
 
 CELERY_TIMEZONE = "Asia/Almaty"
 CELERY_TASK_TRACK_STARTED = True
@@ -157,9 +175,3 @@ INTERNAL_IPS = [
 ]
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
-
-DJANGORESIZED_DEFAULT_SCALE = 0.7
-DJANGORESIZED_DEFAULT_QUALITY = 75
-DJANGORESIZED_DEFAULT_KEEP_META = True
-DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
-DJANGORESIZED_DEFAULT_SIZE = [400, 300]
