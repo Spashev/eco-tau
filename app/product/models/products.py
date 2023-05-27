@@ -1,8 +1,6 @@
 from django.db import models
-from django.db.models.signals import post_save, post_delete, pre_delete
+from django.db.models.signals import post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.dispatch import receiver
 from utils.models import TimestampMixin, CharNameModel
 from product.signals import product_like, product_dislike
 from product import Priority
@@ -11,6 +9,7 @@ from product import Priority
 class ActiveProductManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_active=True)
+
 
 class Product(CharNameModel, TimestampMixin, models.Model):
     price_per_night = models.CharField(verbose_name=_('Цена за ночь'), max_length=255)
@@ -28,7 +27,8 @@ class Product(CharNameModel, TimestampMixin, models.Model):
     city = models.CharField(verbose_name='Город/Район', max_length=255)
     address = models.CharField(verbose_name='Адрес', max_length=255)
     convenience = models.ManyToManyField(to='product.Convenience', related_name='products')
-    type = models.ForeignKey(to='product.Type', verbose_name=_('Тип построение'), related_name='products', on_delete=models.PROTECT)
+    type = models.ForeignKey(to='product.Type', verbose_name=_('Тип построение'), related_name='products',
+                             on_delete=models.PROTECT)
     lng = models.CharField(verbose_name='Координата Longitude', max_length=255, null=True, blank=True)
     lat = models.CharField(verbose_name='Координата Latitude', max_length=255, null=True, blank=True)
     is_active = models.BooleanField(verbose_name=_('Активный'), default=False)
@@ -54,6 +54,7 @@ class Product(CharNameModel, TimestampMixin, models.Model):
     def remove_like(self):
         self.like_count -= 1
         self.save()
+
 
 class Like(TimestampMixin, models.Model):
     product = models.ForeignKey(Product, related_name='likes', on_delete=models.CASCADE)

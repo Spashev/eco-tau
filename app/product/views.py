@@ -1,20 +1,17 @@
-from django.shortcuts import render
-from rest_framework import viewsets, mixins, permissions, status, filters, generics
+from rest_framework import viewsets, mixins, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from django.shortcuts import get_object_or_404
 from django.http import Http404
-from drf_yasg import openapi, utils
+from drf_yasg import openapi
 from django.db.models import Q
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
     ProductSearchSerializer, CommentSerializer
-from product.models import Product, Booking, Image, Category, Comment, Like
+from product.models import Product, Booking, Image, Category, Comment
 from product.filters import BookingFilterSet, ProductFilterSet
-from product.permissions import ProductPermissions, CommentPermissions
-from utils.permissions import AuthorOrReadOnly
+from product.permissions import ProductPermissions, CommentPermissions, ProductPreviewPermissions
 from utils.logger import log_exception
 
 category = openapi.Parameter('category', openapi.IN_QUERY, description="Category", type=openapi.TYPE_INTEGER)
@@ -150,6 +147,15 @@ class ProductSearchViewSet(
         except Exception as e:
             log_exception(e, f'Search error {str(e)}')
             raise Http404
+
+
+class ProductPreviewViewSet(
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = ProductListSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, ProductPreviewPermissions)
+    queryset = Product.objects.all()
 
 
 class CommentViewSet(

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from product.models import Product, Category, Convenience, Type, Image, Like
+from product.models import Product, Category, Convenience, Type, Like
 from product.serializers import booking, comment
 from django.db.models import Sum
 import math
@@ -109,13 +109,14 @@ class ProductListSerializer(serializers.ModelSerializer):
             'address',
             'type',
             'images',
+            'is_active',
             'rating',
             'lat',
             'lng'
         )
 
     def get_rating(self, obj):
-        total_likes =  Product.objects.aggregate(Sum('like_count'))
+        total_likes = Product.objects.aggregate(Sum('like_count'))
         return math.ceil((int(obj.like_count) / int(total_likes.get('like_count__sum'))) * 100)
 
 
