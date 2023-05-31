@@ -1,5 +1,6 @@
 from product.serializers.product import ProductCreateSerializer, ProductListSerializer, TypeSerializer, \
-    CategorySerializer, ConvenienceSerializer, ProductLikeSerializer, ProductRetrieveSerializer, ProductSearchSerializer
+    CategorySerializer, ConvenienceSerializer, ProductLikeSerializer, ProductRetrieveSerializer, ProductSearchSerializer, \
+    FavoritesListSerializer
 from product.serializers.booking import BookingSerializer
 from product.serializers.image import UploadFilesSerializer
 from product.serializers.comment import CommentSerializer, CommentListSerializer
@@ -17,4 +18,5 @@ __all__ = (
     'ProductSearchSerializer',
     'CommentSerializer',
     'CommentListSerializer',
+    'FavoritesListSerializer',
 )

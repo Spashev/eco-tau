@@ -1,5 +1,5 @@
 from django.contrib import admin
-from product.models import Type, Category, Product, Convenience, Image, Booking, Like, Comment
+from product.models import Type, Category, Product, Convenience, Image, Booking, Like, Comment, Favorites
 
 admin.site.register(Type)
 admin.site.register(Category)
@@ -8,6 +8,7 @@ admin.site.register(Image)
 admin.site.register(Booking)
 admin.site.register(Like)
 admin.site.register(Comment)
+admin.site.register(Favorites)
 
 
 class ProductImageInline(admin.TabularInline):

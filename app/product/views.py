@@ -8,8 +8,8 @@ from django.db.models import Q
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
-    ProductSearchSerializer, CommentSerializer
-from product.models import Product, Booking, Image, Category, Comment
+    ProductSearchSerializer, CommentSerializer, FavoritesListSerializer
+from product.models import Product, Booking, Image, Category, Comment, Favorites
 from product.filters import BookingFilterSet, ProductFilterSet
 from product.permissions import ProductPermissions, CommentPermissions, ProductPreviewPermissions
 from utils.logger import log_exception
@@ -46,6 +46,7 @@ class ProductViewSet(
             likes = user.likes.filter(product=obj)
             if likes:
                 likes.first().delete()
+                return Response({'message': 'Product like removed.'}, status=status.HTTP_200_OK)
             else:
                 obj.likes.create(user=user)
 
@@ -85,7 +86,6 @@ class ProductRetrieveViewSet(
         try:
             product = Product.active_objects.get(pk=pk)
             serializer = ProductRetrieveSerializer(product)
-            print(serializer.validate)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             log_exception(e, f'Product details {str(e)}')
@@ -156,6 +156,24 @@ class ProductPreviewViewSet(
     serializer_class = ProductListSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, ProductPreviewPermissions)
     queryset = Product.objects.all()
+
+
+class FavoritesViewSet(
+    generics.GenericAPIView
+):
+    serializer_class = FavoritesListSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    queryset = Favorites.objects.all()
+
+    def get(self, request):
+        try:
+            user = request.user
+            favorites = user.favorites.all()
+            serializer = FavoritesListSerializer(favorites)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            log_exception(e, f'Product not found {str(e)}')
+            raise Http404
 
 
 class CommentViewSet(

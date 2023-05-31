@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from product.models import Product, Category, Convenience, Type, Like
+from product.models import Product, Category, Convenience, Type, Like, Favorites
 from product.serializers import booking, comment
 from django.db.models import Sum
 import math
@@ -193,3 +193,20 @@ class ProductLikeSerializer(serializers.ModelSerializer):
         fields = (
             'user',
         )
+
+
+class FavoritesListSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Favorites
+        fields = (
+            'products',
+        )
+
+    def get_products(self, obj):
+        products = []
+        for favorites in obj:
+            product = favorites.product
+            products.append(product)
+        return ProductListSerializer(products, many=True).data

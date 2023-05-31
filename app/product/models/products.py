@@ -61,5 +61,16 @@ class Like(TimestampMixin, models.Model):
     user = models.ForeignKey('account.User', related_name='likes', on_delete=models.CASCADE)
 
 
+class Favorites(TimestampMixin, models.Model):
+    product = models.ForeignKey(Product, related_name='favorites', on_delete=models.CASCADE)
+    user = models.ForeignKey('account.User', related_name='favorites', on_delete=models.CASCADE)
+    like = models.ForeignKey(Like, related_name='favorites', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = _('Избранные')
+        verbose_name_plural = _('Избранные')
+
+
 post_save.connect(product_like, sender=Like)
 pre_delete.connect(product_dislike, sender=Like)
