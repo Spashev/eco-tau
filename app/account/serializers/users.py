@@ -80,3 +80,42 @@ class ResetPasswordSerializer(serializers.Serializer):
         instance: User = self.validated_data.get('instance')
         instance.reset_password()
         return instance
+
+
+class CreateManagerSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'middle_name',
+            'phone_number',
+            'iin',
+            'password',
+        )
+        read_only_fields = ['id']
+
+    @transaction.atomic
+    def create(self, validated_data):
+        instance: User = User.objects.create_user(**validated_data, role=RoleType.MANAGER, is_staff=True)
+        return instance
+
+
+class UpdateManagerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'middle_name',
+            'phone_number',
+            'is_active',
+            'iin',
+        )
+        read_only_fields = ['id']
