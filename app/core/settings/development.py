@@ -24,6 +24,7 @@ SHELL_PLUS = "ipython"
 
 # Cors
 CORS_ORIGIN_ALLOW_ALL = True
+# CSRF_TRUSTED_ORIGINS = ['https://eco-demal.kz']
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
