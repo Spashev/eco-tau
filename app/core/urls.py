@@ -9,6 +9,7 @@ urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
     path('swagger/', include(swagger_patterns)),
 
+    path('', include('admin_volt.urls')),
     path('admin/', admin.site.urls),
 
     path('api/v1/', include('account.urls')),
