@@ -9,6 +9,4 @@ class Booking(models.Model):
     product = models.ManyToManyField(to=Product)
 
     class Meta:
-        verbose_name = 'Бронь'
-        verbose_name_plural = 'Брони'
         ordering = ('-id', )

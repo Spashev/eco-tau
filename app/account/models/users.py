@@ -41,8 +41,6 @@ class User(
 
     class Meta:
         ordering = ('-created_at',)
-        verbose_name = _("Пользователь")
-        verbose_name_plural = _("Пользователи")
 
     @property
     def full_name(self):

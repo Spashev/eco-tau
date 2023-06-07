@@ -15,8 +15,6 @@ class Category(CharNameModel, models.Model):
 
     class Meta:
         ordering = ("-pk",)
-        verbose_name = _('Категория')
-        verbose_name_plural = _('Категории')
 
     def __str__(self):
         return self.name
@@ -30,8 +28,6 @@ class Convenience(CharNameModel, models.Model):
 
     class Meta:
         ordering = ("-pk",)
-        verbose_name = _('Условия')
-        verbose_name_plural = _('Условии')
 
     def __str__(self):
         return self.name
@@ -40,8 +36,6 @@ class Convenience(CharNameModel, models.Model):
 class Type(CharNameModel, TimestampMixin, models.Model):
     class Meta:
         ordering = ("-created_at",)
-        verbose_name = _('Тип построении домов')
-        verbose_name_plural = _('Тип построении домов')
 
     def __str__(self):
         return self.name
@@ -58,8 +52,6 @@ class Image(models.Model, ResizeImageMixin):
                                 on_delete=models.CASCADE, null=True, blank=True)
     class Meta:
         ordering = ("-pk",)
-        verbose_name = _('Картинка продукта')
-        verbose_name_plural = _('Картинки продуктов')
 
     def clean_original(self):
         image = self.cleaned_data.get('original', False)

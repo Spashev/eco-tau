@@ -41,8 +41,6 @@ class Product(CharNameModel, TimestampMixin, models.Model):
 
     class Meta:
         ordering = ("-created_at",)
-        verbose_name = _('Зона отдыха')
-        verbose_name_plural = _('Зона отдыха')
 
     def __str__(self):
         return self.name
@@ -68,8 +66,6 @@ class Favorites(TimestampMixin, models.Model):
 
     class Meta:
         ordering = ("-created_at",)
-        verbose_name = _('Избранные')
-        verbose_name_plural = _('Избранные')
 
 
 post_save.connect(product_like, sender=Like)
