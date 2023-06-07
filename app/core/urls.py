@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from core import admin_view
 
 from core.swagger import swagger_patterns
 
@@ -10,6 +11,7 @@ urlpatterns = [
     path('swagger/', include(swagger_patterns)),
 
     path('', include('admin_volt.urls')),
+    path('admin/', admin_view.index, name="index"),
     path('admin/', admin.site.urls),
 
     path('api/v1/', include('account.urls')),

@@ -215,4 +215,3 @@ ENV/
 /mediafiles/
 /.pytest_cache/
 /media/
-/static/

@@ -214,4 +214,3 @@ ENV/
 # End of https://www.gitignore.io/api/macos,linux,django,python,pycharm
 /minio/
 /app/media/
-/app/static/
