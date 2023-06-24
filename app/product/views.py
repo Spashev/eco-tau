@@ -100,7 +100,7 @@ class ProductListViewSet(
     authentication_classes = []
     permission_classes = []
     filterset_class = ProductFilterSet
-    filterset_fields = ('price_per_night', 'rooms_qty', 'type', 'toilet_qty',  'category')
+    filterset_fields = ('min_price', 'max_price', 'rooms_qty', 'type', 'toilet_qty',  'category')
     queryset = Product.active_objects.prefetch_related('booking_set').all()
 
 
