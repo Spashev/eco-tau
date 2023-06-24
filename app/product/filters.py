@@ -4,15 +4,14 @@ from product.models import Product, Booking
 
 class ProductFilterSet(rest_filters.FilterSet):
     price_per_night = rest_filters.CharFilter(field_name='price_per_night', lookup_expr='lte')
-    price_per_week = rest_filters.CharFilter(field_name='price_per_week', lookup_expr='lte')
-    price_per_month = rest_filters.CharFilter(field_name='price_per_month', lookup_expr='lte')
-    name = rest_filters.CharFilter(field_name='name', lookup_expr='icontains')
-    address = rest_filters.CharFilter(field_name='address', lookup_expr='icontains')
+    rooms_qty = rest_filters.CharFilter(field_name='rooms_qty', lookup_expr='lte')
+    toilet_qty = rest_filters.CharFilter(field_name='toilet_qty', lookup_expr='lte')
+    type = rest_filters.CharFilter(field_name='type__pk')
     category = rest_filters.NumberFilter(field_name='category__pk')
 
     class Meta:
         model = Product
-        fields = ['price_per_night', 'price_per_week', 'price_per_month', 'name', 'address', 'category']
+        fields = ['price_per_night', 'rooms_qty', 'type', 'toilet_qty',  'category']
 
 
 class BookingFilterSet(rest_filters.FilterSet):
