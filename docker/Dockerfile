@@ -10,27 +10,26 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Add alpine mirrors
 RUN apt-get update \
   && apt-get install -y --no-install-recommends apt-utils \
   && apt-get install -y --no-install-recommends libc-dev \
   && apt-get install -y --no-install-recommends gcc \
   && apt-get install -y --no-install-recommends gettext \
   && apt-get install -y --no-install-recommends screen \
-  && apt-get clean
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists\*
 
 WORKDIR /code
 
 COPY app /code
 COPY app/product/management/images /code/media/
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-RUN pip install Redis
-RUN pip install uvicorn
-RUN pip install psycopg2
-RUN pip install flake8
-RUN pip install pytest-django
+RUN pip install --upgrade pip &&  pip install -r requirements.txt && pip install \
+    Redis \
+    uvicorn \
+    psycopg2 \
+    flake8  \
+    pytest-django
 
 EXPOSE 8000
 EXPOSE 9000
