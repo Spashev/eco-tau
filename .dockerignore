@@ -12,8 +12,8 @@ db.sqlite3
 .git
 .gitignore
 
-# virtualenv
 .venv
 venv/
 ENV/
-minio
+.minio
+minio/
