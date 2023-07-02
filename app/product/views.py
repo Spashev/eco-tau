@@ -98,7 +98,8 @@ class ProductListViewSet(
     authentication_classes = []
     permission_classes = []
     filterset_class = ProductFilterSet
-    filterset_fields = ('min_price', 'max_price', 'rooms_qty', 'type', 'toilet_qty',  'category')
+    filterset_fields = (
+    'min_price', 'max_price', 'rooms_qty', 'type', 'toilet_qty', 'category', 'start_date', 'end_date')
     queryset = Product.active_objects.prefetch_related('booking_set').all()
 
 
@@ -115,7 +116,7 @@ class FavoritesViewSet(
     generics.GenericAPIView
 ):
     serializer_class = FavoritesListSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Favorites.objects.all()
 
     def get(self, request):
@@ -146,16 +147,10 @@ class BookingViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
-    authentication_classes = []
     permission_classes = (permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly)
     serializer_class = BookingSerializer
     filterset_class = BookingFilterSet
     queryset = Booking.objects.all()
-
-    def get_serializer_class(self):
-        serializer = self.serializer_class
-
-        return serializer
 
 
 class CategoryViewSet(

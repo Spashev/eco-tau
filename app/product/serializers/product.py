@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
+
 from rest_framework import serializers
 from product.models import Product, Category, Convenience, Type, Like, Favorites
 from product.serializers import booking, comment
-from django.db.models import Sum
+from django.db.models import Sum, Q
 import math
 
 from utils.serializers import ImageSerializer, UserSerializer
@@ -39,7 +41,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
     convenience = ConvenienceSerializer(many=True, read_only=True)
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
-    booking = serializers.SerializerMethodField()
+    bookings = booking.BookingSerializer(many=True, read_only=True)
     comments = serializers.SerializerMethodField()
     owner = UserSerializer()
 
@@ -66,21 +68,30 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
             'images',
             'lat',
             'lng',
-            'booking',
+            'bookings',
             'comments',
             'like_count',
         )
-
-    def get_booking(self, obj):
-        bookings = obj.booking_set.all()
-        serializer = booking.BookingSerializer(bookings, many=True)
-
-        return serializer.data
 
     def get_comments(self, obj):
         comments = obj.product_comments.all()
         serializer = comment.CommentListSerializer(comments, many=True)
         return serializer.data
+
+    def to_representation(self, instance):
+        current_date = datetime.now().date()
+        start_date = current_date.replace(day=1)
+        end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+
+        filtered_bookings = instance.booking_set.filter(
+            Q(start_date__range=(start_date, end_date)) |
+            Q(end_date__range=(start_date, end_date))
+        )
+        serialized_bookings = booking.BookingSerializer(filtered_bookings, many=True).data
+
+        representation = super().to_representation(instance)
+        representation['bookings'] = serialized_bookings
+        return representation
 
 
 class ProductListSerializer(serializers.ModelSerializer):
