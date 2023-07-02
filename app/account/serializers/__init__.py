@@ -1,5 +1,5 @@
 from account.serializers.users import ListUserSerializer, CreateUserSerializer, UpdateUserSerializer, \
-    ResetPasswordSerializer, CreateManagerSerializer, UpdateManagerSerializer
+    ResetPasswordSerializer, CreateManagerSerializer, UpdateManagerSerializer, CheckEmailSerializer
 
 __all__ = (
     "ListUserSerializer",
@@ -8,4 +8,5 @@ __all__ = (
     "ResetPasswordSerializer",
     "CreateManagerSerializer",
     "UpdateManagerSerializer",
+    "CheckEmailSerializer",
 )

@@ -1,6 +1,7 @@
-from rest_framework import viewsets, mixins, permissions
+from rest_framework import viewsets, mixins, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 
 from account import RoleType
 from account.models import User
@@ -11,6 +12,7 @@ from account.serializers import (
     UpdateUserSerializer,
     UpdateManagerSerializer,
     CreateManagerSerializer,
+    CheckEmailSerializer,
 )
 from utils.logger import log_exception
 
@@ -56,6 +58,21 @@ class UserViewSet(
             return Response(status=200)
         except Exception as e:
             log_exception(e, f'Failed to reset password {str(e)}')
+
+
+class UserCheckEmailView(
+    generics.GenericAPIView
+):
+    serializer_class = CheckEmailSerializer
+    authentication_classes = []
+    permission_classes = []
+    queryset = User.objects.all()
+
+    def post(self, request, *args, **kwargs) -> Response:
+        email = request.data.get('email')
+        if User.objects.filter(email=email).exists():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class CreateManagerViewSet(

@@ -15,8 +15,11 @@ class ListUserSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'email',
-            'full_name',
+            'first_name',
+            'last_name',
+            'middle_name',
             'phone_number',
+            'role'
         )
         read_only_fields = ['id']
 
@@ -64,6 +67,14 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             'is_active',
         )
         read_only_fields = ['id']
+
+
+class CheckEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'email',
+        )
 
 
 class ResetPasswordSerializer(serializers.Serializer):
