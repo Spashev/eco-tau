@@ -10,12 +10,10 @@ class ProductFilterSet(rest_filters.FilterSet):
     toilet_qty = rest_filters.CharFilter(field_name='toilet_qty', lookup_expr='lte')
     type = rest_filters.CharFilter(field_name='type__pk')
     category = rest_filters.NumberFilter(field_name='category__pk')
-    start_date = django_filters.DateFilter(field_name='start_date', lookup_expr='gte')
-    end_date = django_filters.DateFilter(field_name='end_date', lookup_expr='lte')
 
     class Meta:
         model = Product
-        fields = ['min_price', 'max_price', 'rooms_qty', 'type', 'toilet_qty',  'category', 'start_date', 'end_date']
+        fields = ['min_price', 'max_price', 'rooms_qty', 'type', 'toilet_qty', 'category']
 
 
 class BookingFilterSet(rest_filters.FilterSet):
