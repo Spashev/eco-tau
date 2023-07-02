@@ -201,3 +201,8 @@ class FavoritesListSerializer(serializers.ModelSerializer):
             product = favorites.product
             products.append(product)
         return ProductListSerializer(products, many=True).data
+
+
+class ProductByDateSerializer(serializers.Serializer):
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()

@@ -1,18 +1,24 @@
 from rest_framework import viewsets, mixins, permissions, status, generics
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.http import Http404
+from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.db.models import Q
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
-    CommentSerializer, FavoritesListSerializer
+    CommentSerializer, FavoritesListSerializer, ProductByDateSerializer
 from product.models import Product, Booking, Image, Category, Comment, Favorites
 from product.filters import BookingFilterSet, ProductFilterSet
 from product.permissions import ProductPermissions, CommentPermissions, ProductPreviewPermissions
 from utils.logger import log_exception
 
 category = openapi.Parameter('category', openapi.IN_QUERY, description="Category", type=openapi.TYPE_INTEGER)
+start_date = openapi.Parameter('start_date', openapi.IN_QUERY, description="Date start", type=openapi.FORMAT_DATE)
+end_date = openapi.Parameter('end_date', openapi.IN_QUERY, description="Date end", type=openapi.FORMAT_DATE)
+guests_count = openapi.Parameter('guests_count', openapi.IN_QUERY, description="Guests total counts", type=openapi.TYPE_INTEGER)
 
 
 class ProductViewSet(
@@ -100,6 +106,33 @@ class ProductListViewSet(
     filterset_class = ProductFilterSet
     filterset_fields = ('min_price', 'max_price', 'rooms_qty', 'type', 'toilet_qty', 'category')
     queryset = Product.active_objects.prefetch_related('booking_set').all()
+
+
+class ProductListByFilterViewSet(
+    generics.GenericAPIView
+):
+    serializer_class = ProductByDateSerializer
+    allowed_methods = ["GET"]
+    queryset = Product.active_objects.all()
+
+    @swagger_auto_schema(manual_parameters=[start_date, end_date, guests_count])
+    def get(self, request, *args, **kwargs):
+        start_date = request.GET.get('start_date', None)
+        end_date = request.GET.get('end_date', None)
+        guests_count = request.GET.get('guests_count', 1)
+
+        products = Product.objects.filter(
+            ~Q(booking__start_date__range=(start_date, end_date)) &
+            ~Q(booking__end_date__range=(start_date, end_date)) &
+            Q(guest_qty__gte=guests_count)
+        )
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 25
+        result_page = paginator.paginate_queryset(products, request)
+        serializer = ProductListSerializer(result_page, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
 
 class ProductPreviewViewSet(
