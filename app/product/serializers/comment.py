@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from product.models import Comment
 
+from utils.serializers import UserSerializer
+
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -17,7 +19,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CommentListSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(source='user.full_name')
+    user = UserSerializer()
 
     class Meta:
         model = Comment

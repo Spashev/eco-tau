@@ -3,14 +3,17 @@ from rest_framework import serializers
 from account.models import User
 from product.models import Image
 
-class UserSerializer(serializers.ModelSerializer):
 
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
             'id',
             'email',
-            'full_name'
+            'first_name',
+            'last_name',
+            'middle_name',
+            'phone_number'
         )
         read_only_fields = ['id']
 

@@ -1,14 +1,12 @@
 from rest_framework import viewsets, mixins, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from django.http import Http404
 from drf_yasg import openapi
-from django.db.models import Q
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
-    ProductSearchSerializer, CommentSerializer, FavoritesListSerializer
+    CommentSerializer, FavoritesListSerializer
 from product.models import Product, Booking, Image, Category, Comment, Favorites
 from product.filters import BookingFilterSet, ProductFilterSet
 from product.permissions import ProductPermissions, CommentPermissions, ProductPreviewPermissions

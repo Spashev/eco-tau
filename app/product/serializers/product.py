@@ -41,7 +41,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, read_only=True)
     booking = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
-    owner = serializers.CharField(source='owner.full_name')
+    owner = UserSerializer()
 
     class Meta:
         model = Product
@@ -118,26 +118,6 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         total_likes = Product.objects.aggregate(Sum('like_count'))
         return math.ceil((int(obj.like_count) / int(total_likes.get('like_count__sum'))) * 100)
-
-
-class ProductSearchSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(required=False)
-    owner = serializers.CharField(required=False)
-    rooms_qty = serializers.IntegerField(required=False)
-    guest_qty = serializers.IntegerField(required=False)
-    date_start = serializers.DateField(required=False)
-    date_end = serializers.DateField(required=False)
-
-    class Meta:
-        model = Product
-        fields = (
-            'name',
-            'owner',
-            'rooms_qty',
-            'guest_qty',
-            'date_start',
-            'date_end'
-        )
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
