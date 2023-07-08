@@ -26,7 +26,6 @@ class UserViewSet(
     queryset = User.objects.all()
     serializer_class = ListUserSerializer
     filterset_fields = ['email']
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_serializer_class(self):
         serializer = self.serializer_class
