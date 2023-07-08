@@ -20,7 +20,6 @@ from utils.logger import log_exception
 class UserViewSet(
     mixins.ListModelMixin,
     mixins.UpdateModelMixin,
-    mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
@@ -32,9 +31,7 @@ class UserViewSet(
     def get_serializer_class(self):
         serializer = self.serializer_class
 
-        if self.action == 'create':
-            serializer = CreateUserSerializer
-        elif self.action == 'reset_password':
+        if self.action == 'reset_password':
             serializer = ResetPasswordSerializer
         elif self.action == 'update':
             serializer = UpdateUserSerializer
@@ -58,6 +55,15 @@ class UserViewSet(
             return Response(status=200)
         except Exception as e:
             log_exception(e, f'Failed to reset password {str(e)}')
+
+
+class UserCreateView(
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = CreateUserSerializer
+    authentication_classes = []
+    permission_classes = []
 
 
 class UserCheckEmailView(

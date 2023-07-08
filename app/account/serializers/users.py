@@ -26,7 +26,7 @@ class ListUserSerializer(serializers.ModelSerializer):
 
 class CreateUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    role = ChoiceField(choices=RoleClientManagerType)
+    role = ChoiceField(choices=RoleClientManagerType, default=RoleClientManagerType.CLIENT)
 
     class Meta:
         model = User
