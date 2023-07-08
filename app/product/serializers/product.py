@@ -204,5 +204,11 @@ class FavoritesListSerializer(serializers.ModelSerializer):
 
 
 class ProductByDateSerializer(serializers.Serializer):
-    start_date = serializers.DateField()
-    end_date = serializers.DateField()
+    start_date = serializers.DateField(required=False)
+    end_date = serializers.DateField(required=False)
+    min_price = serializers.IntegerField(required=False)
+    max_price = serializers.IntegerField(required=False)
+    rooms_qty = serializers.IntegerField(required=False)
+    type = serializers.IntegerField(required=False)
+    toilet_qty = serializers.IntegerField(required=False)
+    category = serializers.IntegerField(required=False)

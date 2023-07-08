@@ -9,16 +9,25 @@ from django.db.models import Q
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
-    CommentSerializer, FavoritesListSerializer, ProductByDateSerializer
+    CommentSerializer, FavoritesListSerializer
 from product.models import Product, Booking, Image, Category, Comment, Favorites
-from product.filters import BookingFilterSet, ProductFilterSet
+from product.filters import BookingFilterSet
 from product.permissions import ProductPermissions, CommentPermissions, ProductPreviewPermissions
 from utils.logger import log_exception
 
 category = openapi.Parameter('category', openapi.IN_QUERY, description="Category", type=openapi.TYPE_INTEGER)
 start_date = openapi.Parameter('start_date', openapi.IN_QUERY, description="Date start", type=openapi.FORMAT_DATE)
 end_date = openapi.Parameter('end_date', openapi.IN_QUERY, description="Date end", type=openapi.FORMAT_DATE)
-guests_count = openapi.Parameter('guests_count', openapi.IN_QUERY, description="Guests total counts", type=openapi.TYPE_INTEGER)
+guests_count = openapi.Parameter('guests_count', openapi.IN_QUERY, description="Guests total counts",
+                                 type=openapi.TYPE_INTEGER)
+min_price = openapi.Parameter('min_price', openapi.IN_QUERY, description="Min price", type=openapi.TYPE_INTEGER)
+max_price = openapi.Parameter('max_price', openapi.IN_QUERY, description="Max price", type=openapi.TYPE_INTEGER)
+rooms_qty = openapi.Parameter('rooms_qty', openapi.IN_QUERY, description="Rooms total counts",
+                              type=openapi.TYPE_INTEGER)
+type = openapi.Parameter('type', openapi.IN_QUERY, description="House type", type=openapi.TYPE_INTEGER)
+toilet_qty = openapi.Parameter('toilet_qty', openapi.IN_QUERY, description="Toilet total counts",
+                               type=openapi.TYPE_INTEGER)
+limit = openapi.Parameter('limit', openapi.IN_QUERY, description="Limit", type=openapi.TYPE_INTEGER)
 
 
 class ProductViewSet(
@@ -96,40 +105,65 @@ class ProductRetrieveViewSet(
             raise Http404
 
 
-class ProductListViewSet(
-    generics.ListAPIView,
-    generics.GenericAPIView
-):
-    serializer_class = ProductListSerializer
-    authentication_classes = []
-    permission_classes = []
-    filterset_class = ProductFilterSet
-    filterset_fields = ('min_price', 'max_price', 'rooms_qty', 'type', 'toilet_qty', 'category')
-    queryset = Product.active_objects.prefetch_related('booking_set').all()
-
-
 class ProductListByFilterViewSet(
     generics.GenericAPIView
 ):
-    serializer_class = ProductByDateSerializer
+    authentication_classes = []
+    permission_classes = []
+    serializer_class = ProductListSerializer
     allowed_methods = ["GET"]
-    queryset = Product.active_objects.all()
+    queryset = Product.active_objects.prefetch_related('booking_set').all()
 
-    @swagger_auto_schema(manual_parameters=[start_date, end_date, guests_count])
+    @swagger_auto_schema(
+        manual_parameters=[min_price, max_price, start_date, end_date, guests_count, rooms_qty, toilet_qty, category,
+                           type, limit])
     def get(self, request, *args, **kwargs):
         start_date = request.GET.get('start_date', None)
         end_date = request.GET.get('end_date', None)
         guests_count = request.GET.get('guests_count', 1)
+        min_price = request.GET.get('min_price', None)
+        max_price = request.GET.get('max_price', None)
+        rooms_qty = request.GET.get('rooms_qty', None)
+        toilet_qty = request.GET.get('toilet_qty', None)
+        category = request.GET.get('category', None)
+        type = request.GET.get('type', None)
+        limit = request.GET.get('limit', None)
 
-        products = Product.objects.filter(
-            ~Q(booking__start_date__range=(start_date, end_date)) &
-            ~Q(booking__end_date__range=(start_date, end_date)) &
-            Q(guest_qty__gte=guests_count)
-        )
+        q = Q()
+
+        if min_price is not None:
+            q &= Q(price_per_night__gte=min_price)
+
+        if max_price is not None:
+            q &= Q(price_per_night__lte=max_price)
+
+        if start_date is not None:
+            q &= ~Q(booking__start_date__range=(start_date, end_date))
+
+        if end_date is not None:
+            q &= ~Q(booking__end_date__range=(start_date, end_date))
+
+        if guests_count is not None:
+            q &= Q(guest_qty__gte=guests_count)
+
+        if rooms_qty is not None:
+            q &= Q(rooms_qty__gte=rooms_qty)
+
+        if toilet_qty is not None:
+            q &= Q(toilet_qty__gte=toilet_qty)
+
+        if category is not None:
+            q &= Q(category__pk=category)
+
+        if type is not None:
+            q &= Q(type__pk=type)
+
+        queryset = Product.objects.filter(q)
 
         paginator = PageNumberPagination()
-        paginator.page_size = 25
-        result_page = paginator.paginate_queryset(products, request)
+
+        paginator.page_size = limit if limit else 25
+        result_page = paginator.paginate_queryset(queryset, request)
         serializer = ProductListSerializer(result_page, many=True)
 
         return paginator.get_paginated_response(serializer.data)
