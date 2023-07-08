@@ -20,7 +20,7 @@ class User(
     models.Model,
 ):
     username = None
-    email = models.EmailField(verbose_name=_('Email'), blank=True, null=True, unique=True)
+    email = models.EmailField(verbose_name=_('Email'), unique=True)
     first_name = models.CharField(verbose_name=_("Имя"), max_length=100)
     last_name = models.CharField(verbose_name=_("Фамилия"), max_length=100, blank=True, null=True)
     middle_name = models.CharField(verbose_name=_("Отчество"), max_length=100, blank=True)
