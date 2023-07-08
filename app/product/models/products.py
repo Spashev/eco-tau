@@ -68,7 +68,7 @@ class Product(CharNameModel, TimestampMixin, models.Model):
 
     def recalculate_rating(self, like_count):
         like_count_sum = Product.objects.aggregate(like_count_sum=Sum('like_count'))['like_count_sum']
-        return math.ceil((int(like_count) / int(like_count_sum)) * 100)
+        return math.ceil((int(like_count_sum) / int(like_count)))
 
 
 class Like(TimestampMixin, models.Model):
