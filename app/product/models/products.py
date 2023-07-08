@@ -1,18 +1,22 @@
 from django.db import models
+from django.db.models import Sum
 from django.db.models.signals import post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
 from utils.models import TimestampMixin, CharNameModel
 from product.signals import product_like, product_dislike
 from product import Priority
+import math
 
 
 class ProductManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True).select_related('owner').prefetch_related(
-            'category',
-            'convenience',
-            'type'
-        )
+        return super().get_queryset().filter(is_active=True).select_related('owner', 'type').prefetch_related(
+                'category',
+                'convenience',
+                'booking_set',
+                'images',
+                'product_comments'
+            )
 
 
 class Product(CharNameModel, TimestampMixin, models.Model):
@@ -38,6 +42,7 @@ class Product(CharNameModel, TimestampMixin, models.Model):
     is_active = models.BooleanField(verbose_name=_('Активный'), default=False)
     priority = models.TextField(choices=Priority.choices, default=Priority.MEDIUM, max_length=50)
     like_count = models.PositiveIntegerField(verbose_name='Likes', default=0)
+    rating = models.PositiveIntegerField(verbose_name='Rating', default=0)
     comments = models.TextField(verbose_name='Коментарии', null=True, blank=True)
 
     objects = models.Manager()
@@ -53,11 +58,17 @@ class Product(CharNameModel, TimestampMixin, models.Model):
 
     def add_like(self):
         self.like_count += 1
+        self.rating = self.recalculate_rating(self.like_count)
         self.save()
 
     def remove_like(self):
         self.like_count -= 1
+        self.rating = self.recalculate_rating(self.like_count)
         self.save()
+
+    def recalculate_rating(self, like_count):
+        like_count_sum = Product.objects.aggregate(like_count_sum=Sum('like_count'))['like_count_sum']
+        return math.ceil((int(like_count) / int(like_count_sum)) * 100)
 
 
 class Like(TimestampMixin, models.Model):

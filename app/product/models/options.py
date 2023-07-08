@@ -56,6 +56,7 @@ class Image(models.Model, ResizeImageMixin):
     size = models.IntegerField(default=None, blank=True, null=True)
     product = models.ForeignKey('product.Product', verbose_name=_('Продукт'), related_name='images',
                                 on_delete=models.CASCADE, null=True, blank=True)
+
     class Meta:
         ordering = ("-pk",)
         verbose_name = _('Картинка продукта')

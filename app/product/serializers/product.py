@@ -3,8 +3,7 @@ from datetime import datetime, timedelta
 from rest_framework import serializers
 from product.models import Product, Category, Convenience, Type, Like, Favorites
 from product.serializers import booking, comment
-from django.db.models import Sum, Q
-import math
+from django.db.models import Q
 
 from utils.serializers import ImageSerializer, UserSerializer
 from utils.logger import log_exception
@@ -71,6 +70,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
             'bookings',
             'comments',
             'like_count',
+            'rating',
         )
 
     def get_comments(self, obj):
@@ -98,7 +98,6 @@ class ProductListSerializer(serializers.ModelSerializer):
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
     owner = UserSerializer()
-    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -125,10 +124,6 @@ class ProductListSerializer(serializers.ModelSerializer):
             'lat',
             'lng'
         )
-
-    def get_rating(self, obj):
-        total_likes = Product.objects.aggregate(Sum('like_count'))
-        return math.ceil((int(obj.like_count) / int(total_likes.get('like_count__sum'))) * 100)
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
