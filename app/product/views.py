@@ -38,7 +38,7 @@ class ProductViewSet(
 ):
     serializer_class = ProductListSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, ProductPermissions)
-    queryset = Product.active_objects.all()
+    queryset = Product.with_related.all()
 
     def get_serializer_class(self):
         serializer = self.serializer_class
@@ -93,11 +93,11 @@ class ProductRetrieveViewSet(
     serializer_class = ProductRetrieveSerializer
     authentication_classes = []
     permission_classes = []
-    queryset = Product.active_objects.all()
+    queryset = Product.with_related.all()
 
     def get(self, request, pk, *args, **kwargs):
         try:
-            product = Product.active_objects.get(pk=pk)
+            product = Product.with_related.get(pk=pk)
             serializer = ProductRetrieveSerializer(product)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -112,7 +112,7 @@ class ProductListByFilterViewSet(
     permission_classes = []
     serializer_class = ProductListSerializer
     allowed_methods = ["GET"]
-    queryset = Product.active_objects.prefetch_related('booking_set').all()
+    queryset = Product.with_related.all()
 
     @swagger_auto_schema(
         manual_parameters=[min_price, max_price, start_date, end_date, guests_count, rooms_qty, toilet_qty, category,
@@ -158,7 +158,7 @@ class ProductListByFilterViewSet(
         if type is not None:
             q &= Q(type__pk=type)
 
-        queryset = Product.objects.filter(q)
+        queryset = Product.with_related.filter(q)
 
         paginator = PageNumberPagination()
 
@@ -175,7 +175,7 @@ class ProductPreviewViewSet(
 ):
     serializer_class = ProductListSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, ProductPreviewPermissions)
-    queryset = Product.objects.all()
+    queryset = Product.with_related.all()
 
 
 class FavoritesViewSet(

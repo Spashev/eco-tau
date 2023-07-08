@@ -6,9 +6,13 @@ from product.signals import product_like, product_dislike
 from product import Priority
 
 
-class ActiveProductManager(models.Manager):
+class ProductManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(is_active=True).select_related('owner').prefetch_related(
+            'category',
+            'convenience',
+            'type'
+        )
 
 
 class Product(CharNameModel, TimestampMixin, models.Model):
@@ -37,7 +41,7 @@ class Product(CharNameModel, TimestampMixin, models.Model):
     comments = models.TextField(verbose_name='Коментарии', null=True, blank=True)
 
     objects = models.Manager()
-    active_objects = ActiveProductManager()
+    with_related = ProductManager()
 
     class Meta:
         ordering = ("-created_at",)
