@@ -38,6 +38,8 @@ class Convenience(CharNameModel, models.Model):
 
 
 class Type(CharNameModel, TimestampMixin, models.Model):
+    icon = models.FileField(verbose_name=_('Иконки'), upload_to='icons/conveniences', null=True, blank=True)
+
     class Meta:
         ordering = ("-created_at",)
         verbose_name = _('Тип построении домов')
