@@ -113,6 +113,7 @@ class ProductListByFilterViewSet(
     serializer_class = ProductListSerializer
     allowed_methods = ["GET"]
     queryset = Product.with_related.all()
+    pagination_class = None
 
     @swagger_auto_schema(
         manual_parameters=[min_price, max_price, start_date, end_date, guests_count, rooms_qty, toilet_qty, category,
