@@ -28,7 +28,8 @@ class Command(BaseCommand):
             ]
             print('Starting create products...')
             for _ in range(5):
-                User.objects.create_user(fake.email(), fake.password(6), role=RoleType.MANAGER)
+                User.objects.create_user(fake.email(), fake.password(6), role=RoleType.MANAGER, last_name=fake.pystr(),
+                                         date_of_birth="1970-01-01", )
                 Category.objects.create(name=fake.pystr())
             for _ in range(3):
                 Type.objects.create(name=fake.pystr())

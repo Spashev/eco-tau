@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 from account import RoleType, RoleClientManagerType
 from account.models import User
 from utils.serializers import ChoiceField
+from utils.validator import validate_date_of_birth_manager, validate_date_of_birth_user
 
 
 class ListUserSerializer(serializers.ModelSerializer):
@@ -19,6 +20,7 @@ class ListUserSerializer(serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'phone_number',
+            'date_of_birth',
             'role'
         )
         read_only_fields = ['id']
@@ -27,6 +29,7 @@ class ListUserSerializer(serializers.ModelSerializer):
 class CreateUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     role = ChoiceField(choices=RoleClientManagerType, default=RoleClientManagerType.CLIENT)
+    date_of_birth = serializers.DateField(validators=[validate_date_of_birth_user])
 
     class Meta:
         model = User
@@ -37,6 +40,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'phone_number',
+            'date_of_birth',
             'password',
             'role'
         )
@@ -55,6 +59,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):
+    date_of_birth = serializers.DateField(validators=[validate_date_of_birth_user])
+
     class Meta:
         model = User
         fields = (
@@ -64,6 +70,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'phone_number',
+            'date_of_birth',
             'is_active',
         )
         read_only_fields = ['id']
@@ -95,6 +102,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 class CreateManagerSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    date_of_birth = serializers.DateField(validators=[validate_date_of_birth_manager])
 
     class Meta:
         model = User
@@ -105,6 +113,7 @@ class CreateManagerSerializer(serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'phone_number',
+            'date_of_birth',
             'iin',
             'password',
         )
@@ -117,6 +126,8 @@ class CreateManagerSerializer(serializers.ModelSerializer):
 
 
 class UpdateManagerSerializer(serializers.ModelSerializer):
+    date_of_birth = serializers.DateField(validators=[validate_date_of_birth_manager])
+
     class Meta:
         model = User
         fields = (
@@ -126,6 +137,7 @@ class UpdateManagerSerializer(serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'phone_number',
+            'date_of_birth',
             'is_active',
             'iin',
         )

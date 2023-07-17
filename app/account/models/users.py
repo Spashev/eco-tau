@@ -22,8 +22,9 @@ class User(
     username = None
     email = models.EmailField(verbose_name=_('Email'), unique=True)
     first_name = models.CharField(verbose_name=_("Имя"), max_length=100)
-    last_name = models.CharField(verbose_name=_("Фамилия"), max_length=100, blank=True, null=True)
+    last_name = models.CharField(verbose_name=_("Фамилия"), max_length=100)
     middle_name = models.CharField(verbose_name=_("Отчество"), max_length=100, blank=True)
+    date_of_birth = models.DateField(verbose_name=_("Дата рождения"))
     phone_number = PhoneNumberField(unique=True, null=True, blank=True)
     avatar = models.ImageField(upload_to='avatar/', blank=True, null=True)
     iin = models.CharField(verbose_name='ИИН', max_length=12, blank=True, null=True)
