@@ -142,3 +142,13 @@ class UpdateManagerSerializer(serializers.ModelSerializer):
             'iin',
         )
         read_only_fields = ['id']
+
+
+class UserActivateSerializer(serializers.ModelSerializer):
+    code = serializers.CharField()
+    class Meta:
+        model = User
+        fields = (
+            'code',
+            'email'
+        )

@@ -90,7 +90,7 @@ services:
     networks:
       - super-app
     ports:
-      - "6370:6379"
+      - "6379:6379"
 
   worker:
     build:

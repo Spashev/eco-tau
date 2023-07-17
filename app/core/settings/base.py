@@ -1,6 +1,7 @@
 import os
 import socket
 from pathlib import Path
+from django_redis import get_redis_connection
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -153,11 +154,29 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_RESULT_BACKEND = 'redis://redis:6379'
 RABBIT_BROKER_URL = 'amqp://guest@rabbit'
 
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = os.getenv('REDIS_PORT')
+REDIS_DB = os.getenv('REDIS_DB')
+
 CURRENT_SITE = os.getenv('CURRENT_SITE')
 CURRENT_UID = os.getenv('CURRENT_UID')
+ACTIVATE_URL = os.getenv('ACTIVATE_URL')
 
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'

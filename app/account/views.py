@@ -1,7 +1,7 @@
 from rest_framework import viewsets, mixins, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
+from django.core.cache import cache
 
 from account import RoleType
 from account.models import User
@@ -13,6 +13,7 @@ from account.serializers import (
     UpdateManagerSerializer,
     CreateManagerSerializer,
     CheckEmailSerializer,
+    UserActivateSerializer,
 )
 from utils.logger import log_exception
 
@@ -103,3 +104,26 @@ class CreateManagerViewSet(
             serializer = UpdateManagerSerializer
 
         return serializer
+
+
+class UserActivateView(
+    generics.GenericAPIView
+):
+    serializer_class = UserActivateSerializer
+    authentication_classes = []
+    permission_classes = []
+    queryset = User.objects.all()
+
+    def post(self, request, *args, **kwargs) -> Response:
+        email = request.data.get('email')
+        code = request.data.get('code')
+        user = User.objects.filter(email=email).first()
+
+        cache_key = f'activation_code:{user.id}'
+        activation_code = cache.get(cache_key)
+
+        if activation_code and code == activation_code:
+            user.is_active = True
+            user.save()
+            return Response({"message": "User activated"}, status=status.HTTP_200_OK)
+        return Response({"message": "Activation code error"}, status=status.HTTP_400_BAD_REQUEST)
