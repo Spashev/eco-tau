@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import viewsets, mixins, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -16,6 +18,7 @@ from account.serializers import (
     UserActivateSerializer,
 )
 from utils.logger import log_exception
+from utils.utils import has_passed_30_minutes
 
 
 class UserViewSet(
@@ -120,6 +123,20 @@ class UserActivateView(
         user = User.objects.filter(email=email).first()
 
         if user is not None:
+            try_key = f'activation_try_{user.id}'
+            activation_try = cache.get(try_key)
+
+            try_time_key = f'activation_try_time_{user.id}'
+            try_time = cache.get(try_time_key)
+
+            if activation_try is None or has_passed_30_minutes(try_time):
+                try_time_key = f'activation_try_time_{user.id}'
+                activation_try = 1
+                cache.set(try_time_key, datetime.now())
+
+            if activation_try and activation_try > 3:
+                return Response({"message": "Too many failed attempts, please try again after 30min"}, status=status.HTTP_200_OK)
+
             cache_key = f'activation_code:{user.id}'
             activation_code = cache.get(cache_key)
 
@@ -127,4 +144,6 @@ class UserActivateView(
                 user.is_active = True
                 user.save()
                 return Response({"message": "User activated"}, status=status.HTTP_200_OK)
+            activation_try += 1
+            cache.set(try_key, activation_try)
         return Response({"message": "Activation code error"}, status=status.HTTP_400_BAD_REQUEST)
