@@ -119,11 +119,12 @@ class UserActivateView(
         code = request.data.get('code')
         user = User.objects.filter(email=email).first()
 
-        cache_key = f'activation_code:{user.id}'
-        activation_code = cache.get(cache_key)
+        if user is not None:
+            cache_key = f'activation_code:{user.id}'
+            activation_code = cache.get(cache_key)
 
-        if activation_code and code == activation_code:
-            user.is_active = True
-            user.save()
-            return Response({"message": "User activated"}, status=status.HTTP_200_OK)
+            if activation_code and code == activation_code:
+                user.is_active = True
+                user.save()
+                return Response({"message": "User activated"}, status=status.HTTP_200_OK)
         return Response({"message": "Activation code error"}, status=status.HTTP_400_BAD_REQUEST)
