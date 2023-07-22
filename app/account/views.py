@@ -30,16 +30,21 @@ from rest_framework.exceptions import AuthenticationFailed
 class UserTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         try:
-            return super().post(request, *args, **kwargs)
-        except AuthenticationFailed as e:
-            return Response(
-                {
-                    'message': str(e),
-                    'detail_code': 'account_not_active'
-                },
-                status=e.status_code
-            )
+            response = super().post(request, *args, **kwargs)
 
+            return response
+        except AuthenticationFailed as e:
+            if e == 'Не найдено активной учетной записи с указанными данными':
+                return Response({
+                        'message': str(e),
+                        'detail_code': 'account_not_active'
+                    },
+                    status=e.status_code
+                )
+            return Response({
+                'message': str(e),
+                'detail_code': 'user_not_found'
+            }, status=e.status_code)
 
 
 class UserViewSet(
