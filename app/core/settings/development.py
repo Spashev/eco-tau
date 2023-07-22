@@ -37,7 +37,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-CORD_ALLOWED_ORIGINS = ['*']
+CORD_ALLOWED_ORIGINS = ['*', 'https://tau.defaul7.su']
 
 LOGGING = {
     'version': 1,
