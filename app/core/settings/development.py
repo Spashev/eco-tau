@@ -3,6 +3,7 @@ from datetime import timedelta
 # django-rest-framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "account.authentication.JWTAuthentication",
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -15,10 +16,10 @@ REST_FRAMEWORK = {
 # simple_jwt
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    'USER_ID_FIELD': 'id',
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+    'USER_ID_FIELD': 'id'
 }
-
+SECRET_KEY = "tau-sold"
 # django-extensions
 SHELL_PLUS = "ipython"
 

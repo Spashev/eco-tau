@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from rest_framework import viewsets, mixins, permissions, status, generics
+from rest_framework import viewsets, mixins, permissions, status, generics, views
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.cache import cache
@@ -17,34 +18,43 @@ from account.serializers import (
     CheckEmailSerializer,
     UserActivateSerializer,
     UserEmailSerializer,
+    ObtainTokenSerializer,
 )
 from utils.logger import log_exception
 from utils.utils import has_passed_30_minutes
 from utils.models import generate_activation_code
 from account.tasks import send_email
-
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.exceptions import AuthenticationFailed
+from account.authentication import JWTAuthentication
 
 
-class UserTokenObtainPairView(TokenObtainPairView):
+class ObtainTokenView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = ObtainTokenSerializer
+
     def post(self, request, *args, **kwargs):
-        try:
-            response = super().post(request, *args, **kwargs)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-            return response
-        except AuthenticationFailed as e:
-            if e == 'Не найдено активной учетной записи с указанными данными':
-                return Response({
-                        'message': str(e),
-                        'detail_code': 'account_not_active'
-                    },
-                    status=e.status_code
-                )
-            return Response({
-                'message': str(e),
-                'detail_code': 'user_not_found'
-            }, status=e.status_code)
+        email = serializer.validated_data.get('email')
+        password = serializer.validated_data.get('password')
+
+        user = User.objects.filter(email=email).first()
+        if user is None:
+            return Response({'message': 'User not found', 'detail_code': 'user_not_found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user.is_active:
+            return Response({'message': 'User not active', 'detail_code': 'user_not_active'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if user is None or not user.check_password(password):
+            return Response({'message': 'Invalid credentials', 'detail_code': 'invalid_credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+        jwt_token = JWTAuthentication.create_jwt(user)
+        create_refresh_token = JWTAuthentication.create_refresh_token(user)
+
+        return Response({
+            'access_token': jwt_token,
+            'refresh_token': create_refresh_token
+        })
 
 
 class UserViewSet(
