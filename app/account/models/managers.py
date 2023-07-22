@@ -3,11 +3,9 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.core.cache import cache
 from django.conf import settings
 
-import random
-import math
-
 from account.tasks import send_created_account_notification, send_email
 from utils.logger import log_exception
+from utils.models import generate_activation_code
 
 
 class UserManager(BaseUserManager):
@@ -19,12 +17,11 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save()
 
-        activation_code = self.generate_activation_code()
+        activation_code = generate_activation_code()
         cache_key = f'activation_code:{user.id}'
         cache.set(cache_key, activation_code)
 
         self.send_activation_code(user.email, activation_code)
-        # self.send_user_create_mail(user.email, password)
         return user
 
     def create_superuser(self, email, password, **extra_fields):
@@ -39,16 +36,6 @@ class UserManager(BaseUserManager):
             raise ValueError(_('account.custom_user_manager.value_error.not_superuser'))
 
         return self.create_user(email, password, **extra_fields)
-
-    def generate_activation_code(self):
-        digits = [i for i in range(0, 10)]
-
-        random_str = ""
-        for i in range(6):
-            index = math.floor(random.random() * 10)
-            random_str += str(digits[index])
-        
-        return random_str
 
     def send_activation_code(self, email, code: str) -> None:
         try:

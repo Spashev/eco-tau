@@ -152,3 +152,12 @@ class UserActivateSerializer(serializers.ModelSerializer):
             'code',
             'email'
         )
+
+
+class UserEmailSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    class Meta:
+        model = User
+        fields = (
+            'email',
+        )

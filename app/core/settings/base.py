@@ -1,7 +1,6 @@
 import os
 import socket
 from pathlib import Path
-from django_redis import get_redis_connection
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 

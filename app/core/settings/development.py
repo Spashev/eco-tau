@@ -61,7 +61,7 @@ LOGGING = {
             'handlers': ['db_log'],
             'level': 'DEBUG'
         },
-        'django.request': {  # logging 500 errors to database
+        'django.request': {
             'handlers': ['db_log'],
             'level': 'ERROR',
             'propagate': False,

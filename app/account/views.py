@@ -16,9 +16,30 @@ from account.serializers import (
     CreateManagerSerializer,
     CheckEmailSerializer,
     UserActivateSerializer,
+    UserEmailSerializer,
 )
 from utils.logger import log_exception
 from utils.utils import has_passed_30_minutes
+from utils.models import generate_activation_code
+from account.tasks import send_email
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.exceptions import AuthenticationFailed
+
+
+class UserTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except AuthenticationFailed as e:
+            return Response(
+                {
+                    'message': str(e),
+                    'detail_code': 'account_not_active'
+                },
+                status=e.status_code
+            )
+
 
 
 class UserViewSet(
@@ -56,6 +77,7 @@ class UserViewSet(
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+
             return Response(status=200)
         except Exception as e:
             log_exception(e, f'Failed to reset password {str(e)}')
@@ -135,7 +157,8 @@ class UserActivateView(
                 cache.set(try_time_key, datetime.now())
 
             if activation_try and activation_try > 3:
-                return Response({"message": "Too many failed attempts, please try again after 30min"}, status=status.HTTP_200_OK)
+                return Response({"message": "Too many failed attempts, please try again after 30min"},
+                                status=status.HTTP_200_OK)
 
             cache_key = f'activation_code:{user.id}'
             activation_code = cache.get(cache_key)
@@ -147,3 +170,34 @@ class UserActivateView(
             activation_try += 1
             cache.set(try_key, activation_try)
         return Response({"message": "Activation code error"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResendActivateView(
+    generics.GenericAPIView
+):
+    serializer_class = UserEmailSerializer
+    authentication_classes = []
+    permission_classes = []
+    queryset = User.objects.all()
+
+    def post(self, request, *args, **kwargs) -> Response:
+        email = request.data.get('email')
+
+        try:
+            user = User.objects.filter(email=email).first()
+            if user is not None:
+                cache_key = f'activation_code:{user.id}'
+                activation_code = generate_activation_code()
+                cache.set(cache_key, activation_code)
+
+                send_email.delay(
+                    "Код активации",
+                    [email],
+                    'email/resend_notification.html',
+                    {'text': activation_code, 'from_email': 'info@example.com'}
+                )
+        except Exception as e:
+            log_exception(e, 'Error in send_activation_code')
+            return Response({"message": "Activation code error"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "Activation code sended"}, status=status.HTTP_200_OK)

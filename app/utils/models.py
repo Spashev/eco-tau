@@ -1,4 +1,6 @@
 import uuid
+import random
+import math
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -28,3 +30,14 @@ class TimestampMixin(models.Model):
     class Meta:
         abstract = True
         ordering = ('created_at', 'updated_at')
+
+
+def generate_activation_code():
+    digits = [i for i in range(0, 10)]
+
+    random_str = ""
+    for i in range(6):
+        index = math.floor(random.random() * 10)
+        random_str += str(digits[index])
+
+    return random_str
