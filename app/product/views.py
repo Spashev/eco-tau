@@ -1,11 +1,11 @@
 from rest_framework import viewsets, mixins, permissions, status, generics
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.db.models import Q
+from rest_framework.pagination import LimitOffsetPagination
 
 from product.serializers import ProductListSerializer, ProductCreateSerializer, BookingSerializer, \
     ProductLikeSerializer, ProductRetrieveSerializer, UploadFilesSerializer, CategorySerializer, \
@@ -28,6 +28,7 @@ type = openapi.Parameter('type', openapi.IN_QUERY, description="House type", typ
 toilet_qty = openapi.Parameter('toilet_qty', openapi.IN_QUERY, description="Toilet total counts",
                                type=openapi.TYPE_INTEGER)
 limit = openapi.Parameter('limit', openapi.IN_QUERY, description="Limit", type=openapi.TYPE_INTEGER)
+offset = openapi.Parameter('offset', openapi.IN_QUERY, description="Offset", type=openapi.TYPE_INTEGER)
 
 
 class ProductViewSet(
@@ -117,7 +118,7 @@ class ProductListByFilterViewSet(
 
     @swagger_auto_schema(
         manual_parameters=[min_price, max_price, start_date, end_date, guests_count, rooms_qty, toilet_qty, category,
-                           type, limit])
+                           type, limit, offset])
     def get(self, request, *args, **kwargs):
         start_date = request.GET.get('start_date', None)
         end_date = request.GET.get('end_date', None)
@@ -128,7 +129,7 @@ class ProductListByFilterViewSet(
         toilet_qty = request.GET.get('toilet_qty', None)
         category = request.GET.get('category', None)
         type = request.GET.get('type', None)
-        limit = request.GET.get('limit', None)
+        offset = request.GET.get('offset', None)
 
         q = Q()
 
@@ -161,9 +162,9 @@ class ProductListByFilterViewSet(
 
         queryset = Product.with_related.filter(q)
 
-        paginator = PageNumberPagination()
+        paginator = LimitOffsetPagination()
 
-        paginator.page_size = limit if limit else 25
+        paginator.page_size = offset if offset else 25
         result_page = paginator.paginate_queryset(queryset, request)
         serializer = ProductListSerializer(result_page, many=True)
 
