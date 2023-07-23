@@ -19,6 +19,7 @@ from account.serializers import (
     UserActivateSerializer,
     UserEmailSerializer,
     ObtainTokenSerializer,
+    UserMeSerializer,
 )
 from utils.logger import log_exception
 from utils.utils import has_passed_30_minutes
@@ -71,19 +72,27 @@ class UserViewSet(
     def get_serializer_class(self):
         serializer = self.serializer_class
 
+        print(self.action)
+
         if self.action == 'reset_password':
             serializer = ResetPasswordSerializer
         elif self.action == 'update':
             serializer = UpdateUserSerializer
         elif self.action == 'partial_update':
             serializer = UpdateUserSerializer
+        elif self.action == 'me':
+            serializer = UserMeSerializer
 
         return serializer
 
     @action(methods=['GET'], detail=False, url_path='me')
     def me(self, requests, *args, **kwargs) -> Response:
-        user = self.request.user
-        serializer = self.get_serializer(user)
+        try:
+            user = self.request.user
+            serializer = self.get_serializer(user)
+        except Exception as e:
+            log_exception(e, 'Error user me')
+
         return Response(serializer.data)
 
     @action(methods=['POST'], detail=False, url_path='reset-password')
