@@ -28,7 +28,7 @@ from account.tasks import send_email
 from account.authentication import JWTAuthentication
 
 
-class ObtainTokenView(views.APIView):
+class ObtainTokenView(viewsets.GenericViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = ObtainTokenSerializer
 

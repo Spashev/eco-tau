@@ -12,7 +12,7 @@ router.register('users', UserViewSet, basename='users')
 router.register('manager', CreateManagerViewSet, basename='manager')
 
 urlpatterns = [
-    path('users/token/', ObtainTokenView.as_view(), name='token_obtain_pair'),
+    path('users/token/', ObtainTokenView.as_view(({'post': 'post'})), name='token_obtain_pair'),
     path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('users/check-email/', UserCheckEmailView.as_view(), name='check-email'),
     path('users/activate/', UserActivateView.as_view(), name='user-activate'),
