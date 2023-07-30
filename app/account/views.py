@@ -40,13 +40,16 @@ class ObtainTokenView(viewsets.GenericViewSet):
 
         user = User.objects.filter(email=email).first()
         if user is None:
-            return Response({'message': 'User not found', 'detail_code': 'user_not_found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'User not found', 'detail_code': 'user_not_found'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         if not user.is_active:
-            return Response({'message': 'User not active', 'detail_code': 'user_not_active'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': 'User not active', 'detail_code': 'user_not_active'},
+                            status=status.HTTP_401_UNAUTHORIZED)
 
         if user is None or not user.check_password(password):
-            return Response({'message': 'Invalid credentials', 'detail_code': 'invalid_credentials'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Invalid credentials', 'detail_code': 'invalid_credentials'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         jwt_token = JWTAuthentication.create_jwt(user)
         create_refresh_token = JWTAuthentication.create_refresh_token(user)
@@ -85,10 +88,11 @@ class UserViewSet(
         try:
             user = self.request.user
             serializer = self.get_serializer(user)
+            return Response(serializer.data)
         except Exception as e:
             log_exception(e, 'Error user me')
 
-        return Response(serializer.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(methods=['POST'], detail=False, url_path='reset-password')
     def reset_password(self, request, *args, **kwargs) -> Response:
