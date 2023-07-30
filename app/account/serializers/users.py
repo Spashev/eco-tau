@@ -173,7 +173,3 @@ class ObtainTokenSerializer(serializers.ModelSerializer):
             'email',
             'password'
         )
-
-
-class UserMeSerializer(serializers.Serializer):
-    pass
