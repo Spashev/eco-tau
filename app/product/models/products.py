@@ -10,12 +10,14 @@ import math
 
 class ProductManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True).select_related('owner', 'type').prefetch_related(
+        return super().get_queryset().filter(is_active=True).select_related('owner', 'type')\
+            .prefetch_related(
                 'category',
                 'convenience',
                 'booking_set',
                 'images',
-                'product_comments'
+                'product_comments',
+                'product_comments__user'
             )
 
 

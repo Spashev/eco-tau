@@ -98,7 +98,6 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
 
     def get_is_favorite(self, obj):
         user_id = self.context.get('user_id')
-        print(user_id)
         if user_id:
             if obj.likes.filter(user_id=user_id).first():
                 return True
