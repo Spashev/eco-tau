@@ -97,10 +97,15 @@ class ProductRetrieveViewSet(
     permission_classes = []
     queryset = Product.with_related.all()
 
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, pk):
         try:
             product = Product.with_related.get(pk=pk)
-            serializer = ProductRetrieveSerializer(product)
+            jwt = JWTAuthentication()
+            user = jwt.authenticate(request)
+            user_id = None
+            if user is not None:
+                user_id = user[0].id
+            serializer = ProductRetrieveSerializer(product, context={'user_id': user_id})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             log_exception(e, f'Product details {str(e)}')
@@ -120,7 +125,7 @@ class ProductListByFilterViewSet(
     @swagger_auto_schema(
         manual_parameters=[min_price, max_price, start_date, end_date, guests_count, rooms_qty, toilet_qty, category,
                            type, limit, offset])
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         start_date = request.GET.get('start_date', None)
         end_date = request.GET.get('end_date', None)
         guests_count = request.GET.get('guests_count', 1)
@@ -165,14 +170,16 @@ class ProductListByFilterViewSet(
         paginator = LimitOffsetPagination()
         paginator.page_size = offset if offset else 25
         result_page = paginator.paginate_queryset(queryset, request)
-        serializer = ProductListSerializer(result_page, many=True)
         try:
             jwt = JWTAuthentication()
             user = jwt.authenticate(request)
+            user_id = None
             if user is not None:
-                serializer = ProductListSerializer(result_page, context={'user_id': user[0].id}, many=True)
+                user_id = user[0].id
+            serializer = ProductListSerializer(result_page, context={'user_id': user_id}, many=True)
         except Exception as e:
             log_exception(e, f'Product list error {str(e)}')
+            raise Http404
 
         return paginator.get_paginated_response(serializer.data)
 
@@ -195,9 +202,12 @@ class FavoritesViewSet(
 
     def get(self, request):
         try:
+            user_id = None
             user = request.user
+            if user:
+                user_id = user.id
             favorites = user.favorites.all()
-            serializer = FavoritesListSerializer(favorites)
+            serializer = FavoritesListSerializer(favorites, context={'user_id': user_id})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             log_exception(e, f'Product not found {str(e)}')

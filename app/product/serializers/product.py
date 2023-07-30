@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 from rest_framework import serializers
 
-from account.models import User
 from product.models import Product, Category, Convenience, Type, Like, Favorites
 from product.serializers import booking, comment
 from django.db.models import Q
@@ -45,6 +44,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
     bookings = booking.BookingSerializer(many=True, read_only=True)
     comments = serializers.SerializerMethodField()
     owner = UserSerializer()
+    is_favorite = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -73,6 +73,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
             'comments',
             'like_count',
             'rating',
+            'is_favorite',
         )
 
     def get_comments(self, obj):
@@ -94,6 +95,14 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['bookings'] = serialized_bookings
         return representation
+
+    def get_is_favorite(self, obj):
+        user_id = self.context.get('user_id')
+        print(user_id)
+        if user_id:
+            if obj.likes.filter(user_id=user_id).first():
+                return True
+        return False
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -203,10 +212,11 @@ class FavoritesListSerializer(serializers.ModelSerializer):
 
     def get_products(self, obj):
         products = []
+        user_id = self.context.get('user_id')
         for favorites in obj:
             product = favorites.product
             products.append(product)
-        return ProductListSerializer(products, many=True).data
+        return ProductListSerializer(products, many=True, context={'user_id': user_id}).data
 
 
 class ProductByDateSerializer(serializers.Serializer):

@@ -16,6 +16,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
             return None
 
         jwt_token = JWTAuthentication.get_the_token_from_header(jwt_token)
+        print(jwt_token)
 
         try:
             payload = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=['HS256'])
