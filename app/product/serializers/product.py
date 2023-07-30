@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
 from rest_framework import serializers
+
+from account.models import User
 from product.models import Product, Category, Convenience, Type, Like, Favorites
 from product.serializers import booking, comment
 from django.db.models import Q
@@ -98,6 +100,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
     owner = UserSerializer()
+    is_favorite = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -120,10 +123,18 @@ class ProductListSerializer(serializers.ModelSerializer):
             'type',
             'images',
             'is_active',
+            'is_favorite',
             'rating',
             'lat',
             'lng'
         )
+
+    def get_is_favorite(self, obj):
+        user_id = self.context.get('user_id')
+        if user_id:
+            if obj.likes.filter(user_id=user_id).first():
+                return True
+        return False
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):

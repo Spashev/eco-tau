@@ -14,6 +14,7 @@ from product.models import Product, Booking, Image, Category, Comment, Favorites
 from product.filters import BookingFilterSet
 from product.permissions import ProductPermissions, CommentPermissions, ProductPreviewPermissions
 from utils.logger import log_exception
+from account.authentication import JWTAuthentication
 
 category = openapi.Parameter('category', openapi.IN_QUERY, description="Category", type=openapi.TYPE_INTEGER)
 start_date = openapi.Parameter('start_date', openapi.IN_QUERY, description="Date start", type=openapi.FORMAT_DATE)
@@ -161,12 +162,17 @@ class ProductListByFilterViewSet(
             q &= Q(type__pk=type)
 
         queryset = Product.with_related.filter(q)
-
         paginator = LimitOffsetPagination()
-
         paginator.page_size = offset if offset else 25
         result_page = paginator.paginate_queryset(queryset, request)
         serializer = ProductListSerializer(result_page, many=True)
+        try:
+            jwt = JWTAuthentication()
+            user = jwt.authenticate(request)
+            if user is not None:
+                serializer = ProductListSerializer(result_page, context={'user_id': user[0].id}, many=True)
+        except Exception as e:
+            log_exception(e, f'Product list error {str(e)}')
 
         return paginator.get_paginated_response(serializer.data)
 
