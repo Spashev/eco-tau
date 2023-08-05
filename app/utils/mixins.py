@@ -1,8 +1,3 @@
-from rest_framework import permissions, filters
-from utils.permissions import AuthorOrReadOnly
-
-from django_filters import rest_framework
-
 import uuid
 from PIL import Image
 from io import BytesIO
