@@ -3,8 +3,6 @@ from datetime import timedelta
 # django-rest-framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
         "account.authentication.JWTAuthentication",
     ),
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
@@ -37,7 +35,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-CORD_ALLOWED_ORIGINS = ['*', 'https://tau.defaul7.su']
+CORD_ALLOWED_ORIGINS = ['*', 'https://tau.defaul7.su', 'https://tau.defaul7.net']
 
 LOGGING = {
     'version': 1,
