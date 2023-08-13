@@ -55,8 +55,8 @@ class ObtainTokenView(viewsets.GenericViewSet):
         create_refresh_token = JWTAuthentication.create_refresh_token(user)
 
         return Response({
-            'access_token': jwt_token,
-            'refresh_token': create_refresh_token
+            'access': jwt_token,
+            'refresh': create_refresh_token
         })
 
 
