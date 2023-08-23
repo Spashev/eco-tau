@@ -134,7 +134,7 @@ class ProductListByFilterViewSet(
         rooms_qty = request.GET.get('rooms_qty', None)
         toilet_qty = request.GET.get('toilet_qty', None)
         category = request.GET.get('category', None)
-        type = request.GET.get('type', None)
+        product_type = request.GET.get('type', None)
         offset = request.GET.get('offset', None)
 
         q = Q()
@@ -163,8 +163,8 @@ class ProductListByFilterViewSet(
         if category is not None:
             q &= Q(category__pk=category)
 
-        if type is not None:
-            q &= Q(type__pk=type)
+        if product_type is not None:
+            q &= Q(type__pk=product_type)
 
         queryset = Product.with_related.filter(q)
         paginator = LimitOffsetPagination()

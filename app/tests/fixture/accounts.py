@@ -19,9 +19,10 @@ def client(db):
     client = UserFactory.create(role=RoleType.CLIENT)
     return client
 
+
 @pytest.fixture()
 def director(db):
-    UserFactory.objects.create(role=RoleType.DIRECTOR)
+    director = UserFactory.objects.create(role=RoleType.DIRECTOR)
     return director
 
 

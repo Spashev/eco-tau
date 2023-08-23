@@ -18,6 +18,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name: str = fake.unique.first_name()
     last_name: str = fake.unique.last_name()
     middle_name = fake.unique.last_name()
+    date_of_birth = fake.date_of_birth()
     phone_number = "87777777777"
     is_staff = True
     is_active = True
