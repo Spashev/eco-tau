@@ -27,7 +27,7 @@ endif
 
 prod: build
 
-install: build start collectstatic migrate ## Spin-up the project with minimal data
+install: build start migrate ## Spin-up the project with minimal data
 
 build: ## Build docker containers
 	$(DOCKER_COMP) build
