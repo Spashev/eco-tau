@@ -8,17 +8,30 @@ from product import Priority
 import math
 
 
+class ActiveProductManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True).select_related('owner', 'type') \
+            .prefetch_related(
+            'category',
+            'convenience',
+            'booking_set',
+            'images',
+            'product_comments',
+            'product_comments__user'
+        )
+
+
 class ProductManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True).select_related('owner', 'type')\
+        return super().get_queryset().select_related('owner', 'type') \
             .prefetch_related(
-                'category',
-                'convenience',
-                'booking_set',
-                'images',
-                'product_comments',
-                'product_comments__user'
-            )
+            'category',
+            'convenience',
+            'booking_set',
+            'images',
+            'product_comments',
+            'product_comments__user'
+        )
 
 
 class Product(CharNameModel, TimestampMixin, models.Model):
@@ -49,6 +62,7 @@ class Product(CharNameModel, TimestampMixin, models.Model):
 
     objects = models.Manager()
     with_related = ProductManager()
+    active_objects = ActiveProductManager()
 
     class Meta:
         ordering = ("-created_at",)

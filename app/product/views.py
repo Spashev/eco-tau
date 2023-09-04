@@ -95,7 +95,7 @@ class ProductRetrieveViewSet(
     serializer_class = ProductRetrieveSerializer
     authentication_classes = []
     permission_classes = []
-    queryset = Product.with_related.all()
+    queryset = Product.active_objects.all()
 
     def get(self, request, pk):
         try:
@@ -119,7 +119,7 @@ class ProductListByFilterViewSet(
     permission_classes = []
     serializer_class = ProductListSerializer
     allowed_methods = ["GET"]
-    queryset = Product.with_related.all()
+    queryset = Product.active_objects.all()
     pagination_class = None
 
     @swagger_auto_schema(
@@ -166,7 +166,7 @@ class ProductListByFilterViewSet(
         if product_type is not None:
             q &= Q(type__pk=product_type)
 
-        queryset = Product.with_related.filter(q)
+        queryset = Product.active_objects.filter(q)
         paginator = LimitOffsetPagination()
         paginator.page_size = offset if offset else 25
         result_page = paginator.paginate_queryset(queryset, request)
