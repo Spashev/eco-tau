@@ -4,6 +4,7 @@ from django.db.models.signals import post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
 from utils.models import TimestampMixin, CharNameModel
 from product.signals import product_like, product_dislike
+from django.core.validators import MinValueValidator, MaxValueValidator
 from product import Priority
 import math
 
@@ -57,7 +58,8 @@ class Product(CharNameModel, TimestampMixin, models.Model):
     is_active = models.BooleanField(verbose_name=_('Активный'), default=False)
     priority = models.TextField(choices=Priority.choices, default=Priority.MEDIUM, max_length=50)
     like_count = models.PositiveIntegerField(verbose_name='Likes', default=0)
-    rating = models.PositiveIntegerField(verbose_name='Rating', default=0)
+    rating = models.PositiveIntegerField(verbose_name='Rating', default=1,
+                                         validators=[MinValueValidator(1), MaxValueValidator(5)])
     comments = models.TextField(verbose_name='Коментарии', null=True, blank=True)
 
     objects = models.Manager()
