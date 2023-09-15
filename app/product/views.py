@@ -179,7 +179,7 @@ class ProductListByFilterViewSet(
             serializer = ProductListSerializer(result_page, context={'user_id': user_id}, many=True)
         except Exception as e:
             log_exception(e, f'Product list error {str(e)}')
-            raise Http404
+            serializer = ProductListSerializer(result_page, many=True)
 
         return paginator.get_paginated_response(serializer.data)
 
