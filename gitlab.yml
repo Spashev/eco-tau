@@ -1,0 +1,28 @@
+image: alpine
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+
+stages:
+  - build
+  - deploy
+
+variables:
+  GIT_SSL_NO_VERIFY: "1"
+
+build:
+  image: library/docker:dind
+  stage: build
+  tags:
+    - tau-backend
+  script:
+    - docker compose -f docker/docker-compose.yml build
+
+deploy:
+  image: library/docker:dind
+  stage: deploy
+  tags:
+    - tau-backend
+  script:
+    - docker compose up -d --build

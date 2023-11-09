@@ -1,23 +1,28 @@
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, F, ExpressionWrapper, IntegerField
 from django.db.models.signals import post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
 from utils.models import TimestampMixin, CharNameModel
 from product.signals import product_like, product_dislike
+from django.core.validators import MinValueValidator, MaxValueValidator
 from product import Priority
 import math
 
 
+class ProductActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('owner').prefetch_related('images', 'like').filter(is_active=True)
+
+
 class ProductManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True).select_related('owner', 'type')\
+        return super().get_queryset().select_related('owner', 'type') \
             .prefetch_related(
-                'category',
                 'convenience',
-                'booking_set',
+                'booking',
                 'images',
                 'product_comments',
-                'product_comments__user'
+                'like',
             )
 
 
@@ -44,11 +49,13 @@ class Product(CharNameModel, TimestampMixin, models.Model):
     is_active = models.BooleanField(verbose_name=_('Активный'), default=False)
     priority = models.TextField(choices=Priority.choices, default=Priority.MEDIUM, max_length=50)
     like_count = models.PositiveIntegerField(verbose_name='Likes', default=0)
-    rating = models.PositiveIntegerField(verbose_name='Rating', default=0)
+    rating = models.PositiveIntegerField(verbose_name='Rating', default=1,
+                                         validators=[MinValueValidator(1), MaxValueValidator(5)])
     comments = models.TextField(verbose_name='Коментарии', null=True, blank=True)
 
     objects = models.Manager()
     with_related = ProductManager()
+    active_related = ProductActiveManager()
 
     class Meta:
         ordering = ("-created_at",)
@@ -59,23 +66,21 @@ class Product(CharNameModel, TimestampMixin, models.Model):
         return self.name
 
     def add_like(self):
-        self.like_count += 1
-        self.rating = self.recalculate_rating(self.like_count)
+        self.like_count = F('like_count') + 1
         self.save()
 
     def remove_like(self):
-        self.like_count -= 1
-        self.rating = self.recalculate_rating(self.like_count)
+        self.like_count = F('like_count') - 1
         self.save()
 
-    def recalculate_rating(self, like_count):
-        like_count_sum = Product.objects.aggregate(like_count_sum=Sum('like_count'))['like_count_sum']
-        return math.ceil((int(like_count_sum) / int(like_count)))
+    def is_favorited_by_user(self, user_id):
+        return self.like.filter(user_id=user_id).exists()
 
 
 class Like(TimestampMixin, models.Model):
-    product = models.ForeignKey(Product, related_name='likes', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='like', on_delete=models.CASCADE)
     user = models.ForeignKey('account.User', related_name='likes', on_delete=models.CASCADE)
+    count = models.PositiveIntegerField(default=1)
 
 
 class Favorites(TimestampMixin, models.Model):

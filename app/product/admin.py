@@ -21,6 +21,6 @@ class ProductImageInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'price_per_night', 'is_active', 'owner', 'rooms_qty', 'address')
     list_display_links = ('id', 'name')
-    list_filter = ('name', 'is_active')
+    list_filter = ('is_active',)
     search_fields = ('id', 'name')
     inlines = [ProductImageInline]

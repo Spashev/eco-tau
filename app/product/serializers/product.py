@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+from django.db.models import Prefetch, OuterRef
 from rest_framework import serializers
 
 from product.models import Product, Category, Convenience, Type, Like, Favorites
@@ -77,7 +77,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
         )
 
     def get_comments(self, obj):
-        comments = obj.product_comments.all()
+        comments = obj.product_comments.filter(is_active=True)[:6]
         serializer = comment.CommentListSerializer(comments, many=True)
         return serializer.data
 
@@ -86,7 +86,7 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
         start_date = current_date.replace(day=1)
         end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
 
-        filtered_bookings = instance.booking_set.filter(
+        filtered_bookings = instance.booking.filter(
             Q(start_date__range=(start_date, end_date)) |
             Q(end_date__range=(start_date, end_date))
         )
@@ -97,15 +97,10 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
         return representation
 
     def get_is_favorite(self, obj):
-        user_id = self.context.get('user_id')
-        if user_id:
-            if obj.likes.filter(user_id=user_id).first():
-                return True
-        return False
+        return hasattr(obj, 'is_favorite') and obj.is_favorite
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    type = TypeSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
     owner = UserSerializer()
     is_favorite = serializers.SerializerMethodField()
@@ -116,33 +111,17 @@ class ProductListSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'price_per_night',
-            'price_per_week',
-            'price_per_month',
             'owner',
-            'rooms_qty',
-            'guest_qty',
-            'bed_qty',
-            'bedroom_qty',
-            'toilet_qty',
-            'bath_qty',
-            'description',
             'city',
             'address',
-            'type',
             'images',
-            'is_active',
             'is_favorite',
             'rating',
-            'lat',
-            'lng'
+            'like_count',
         )
 
     def get_is_favorite(self, obj):
-        user_id = self.context.get('user_id')
-        if user_id:
-            if obj.likes.filter(user_id=user_id).first():
-                return True
-        return False
+        return hasattr(obj, 'is_favorite') and obj.is_favorite
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):

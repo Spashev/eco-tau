@@ -1,1 +1,7 @@
-<svg id="Слой_1" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59.42 61.5"><defs><style>.cls-1{fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:2px;}</style></defs><title>лыжня</title><polyline class="cls-1" points="0.38 12.14 20.69 20.48 30.22 24.4"/><path class="cls-1" d="M75.36,46.26s11.41-2.9,4.43-12.94c0,0-11.75-7.83-12.43,9.36,0,0-11.81-9-20.2,8.34" transform="translate(-26.47 -30.54)"/><path class="cls-1" d="M27.7,72,75.87,90.85s8.68,1.7,9-5.11" transform="translate(-26.47 -30.54)"/><polyline class="cls-1" points="24.72 31.03 34.42 39.38 27.36 51.66"/><path class="cls-1" d="M83.53,61.57S81,66.34,72.47,58.68l-2.9-5.28-5,8.17s8,3.07,7.87,6c0,0,4.53,3.33-11,17.67" transform="translate(-26.47 -30.54)"/></svg>
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 10.1774L15.263 14.8024L20.5479 16.9762" stroke="black" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M30.9014 12.1627C30.9014 12.1627 37.2288 10.5545 33.358 4.98677C33.358 4.98677 26.842 0.644623 26.4649 10.1774C26.4649 10.1774 19.9157 5.18641 15.263 14.8024" stroke="black" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M4.47137 26.4369L31.1842 36.8902C31.1842 36.8902 35.9977 37.833 36.1752 34.0565" stroke="black" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M17.4978 20.6529L22.877 25.2834L18.9619 32.0934" stroke="black" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M35.4321 20.6529C35.4321 20.6529 34.0291 23.2981 29.2987 19.0502L27.6905 16.1222L24.9178 20.6529C24.9178 20.6529 29.3542 22.3554 29.2821 23.9802C29.2821 23.9802 31.7942 25.8269 23.182 33.7792" stroke="black" stroke-width="2.7" stroke-miterlimit="10"/>
+</svg>

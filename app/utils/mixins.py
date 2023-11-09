@@ -21,7 +21,7 @@ class UserQuerySetMixin:
 
 
 class ResizeImageMixin:
-    def resize(self, image_field: models.ImageField, percentage: int = 0.5):
+    def resize(self, image_field: models.ImageField, percentage: float = 0.5):
         try:
             im = Image.open(image_field)
             width, height = im.size

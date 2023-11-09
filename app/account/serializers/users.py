@@ -89,7 +89,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         email = attrs.get('email')
-        if instance := User.objects.filter(Q(email=email) | Q(email=email)).first():
+        if instance := User.objects.filter(Q(email=email)).first():
             attrs['instance'] = instance
             return attrs
         raise ValidationError({'email': 'User with given login/email does not exist'})
@@ -146,6 +146,7 @@ class UpdateManagerSerializer(serializers.ModelSerializer):
 
 class UserActivateSerializer(serializers.ModelSerializer):
     code = serializers.CharField()
+
     class Meta:
         model = User
         fields = (
@@ -156,6 +157,7 @@ class UserActivateSerializer(serializers.ModelSerializer):
 
 class UserEmailSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
+
     class Meta:
         model = User
         fields = (

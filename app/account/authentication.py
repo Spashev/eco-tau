@@ -19,10 +19,12 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
         try:
             payload = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=['HS256'])
+        except jwt.exceptions.ExpiredSignatureError:
+            raise AuthenticationFailed('Token has expired')
         except jwt.exceptions.InvalidSignatureError:
-            raise AuthenticationFailed('Invalid signature')
-        except:
-            raise ParseError()
+            raise AuthenticationFailed('Invalid token signature')
+        except jwt.exceptions.DecodeError:
+            raise AuthenticationFailed('Invalid token format')
 
         email = payload.get('user_identifier')
         if email is None:
@@ -34,6 +36,10 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
         if not user.is_active:
             raise AuthenticationFailed('User not active')
+
+        current_time = datetime.now().timestamp()
+        if 'exp' in payload and payload['exp'] < current_time:
+            raise AuthenticationFailed('Token has expired')
 
         return user, payload
 

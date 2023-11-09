@@ -1,7 +1,7 @@
-FROM python:latest
+# Используйте официальный образ Python
+FROM python:3.12-bullseye AS base
 
-MAINTAINER Spashev Nurken
-
+# Установите переменные среды
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV PYTHONFAULTHANDLER 1
@@ -9,30 +9,38 @@ ENV PYTHONBUFFERED 1
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV ROOT=/app
+ENV TZ=Asia/Astana
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends apt-utils \
-  && apt-get install -y --no-install-recommends libc-dev \
-  && apt-get install -y --no-install-recommends gcc \
-  && apt-get install -y --no-install-recommends gettext \
-  && apt-get install -y --no-install-recommends screen \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists\*
+# Рабочая директория
+WORKDIR $ROOT
 
-WORKDIR /code
+# Add alpine mirrors
+RUN set -eux; \
+    apt-get update && apt-get install -y --no-install-recommends \
+    apt-utils \
+    libc-dev \
+    gcc \
+    gettext \
+    screen \
+    vim \
+    build-essential \
+    postgresql \
+    postgresql-contrib \
+    netcat-traditional \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY app /code
-COPY app/product/management/images /code/media/
+# Копирование кода
+COPY app/ $ROOT
+COPY docker/start.sh docker/entrypoint.sh $ROOT/commands/
+RUN chmod +x $ROOT/commands/*
+ENV PATH="$ROOT/commands:$PATH"
 
-RUN pip install --upgrade pip &&  pip install -r requirements.txt && pip install \
-    Redis \
-    uvicorn \
-    psycopg2 \
-    flake8  \
-    pytest-django
+# Обновление pip
+RUN pip install --upgrade pip &&  pip install -r requirements.txt
 
 EXPOSE 8000
 EXPOSE 9000
 
-COPY docker/start.uvicorn.sh ./
-RUN chmod +x ./start.uvicorn.sh
+# Установка точки входа
+CMD ["entrypoint.sh", "start.sh"]

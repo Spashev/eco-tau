@@ -6,20 +6,21 @@ from tests import BaseTestCase
 
 class TestUsersCreate(BaseTestCase):
     def test_users_create(self):
-        self.client.force_authenticate(user=self.admin)
-        url = reverse('users-list')
+        self.api_client.force_authenticate(user=self.admin)
+        url = reverse('users-create-lists')
 
         data = {
-            "username": "user1",
-            "email": "user1@example.com",
-            "first_name": "user1",
-            "last_name": "user1",
-            "middle_name": "test",
-            "phone_number": "8123471231",
-            "password": "123",
-            "role": "CLIENT"
+          "email": "user@example.com",
+          "first_name": "string",
+          "last_name": "string",
+          "middle_name": "string",
+          "phone_number": "string",
+          "date_of_birth": "2023-10-29",
+          "password": "string",
+          "role": "CLIENT"
         }
-        response = self.client.post(url, data=data)
+
+        response = self.api_client.post(url, data=data)
 
         assert response.status_code == 201
         assert response.data.get("id") == 1

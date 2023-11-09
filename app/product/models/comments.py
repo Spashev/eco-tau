@@ -19,3 +19,6 @@ class Comment(
 
     def __str__(self):
         return self.content[:50]
+
+    class Meta:
+        ordering = ['-id']

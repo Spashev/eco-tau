@@ -1,4 +1,4 @@
-Django==4.1.4
+Django==4.2.6
 drf_yasg==1.21.4
 django_filter==22.1
 django-extensions==3.2.1
@@ -8,20 +8,14 @@ djangorestframework==3.14.0
 djangorestframework_simplejwt==5.2.1
 django_phonenumber_field==7.0.0
 django_phonenumbers==1.0.1
-django_timezone_field===5.0
-django_constance===2.9.1
-django-picklefield===3.1
-celery==5.2.7
-cleo==1.0.0a5
-certifi==2022.9.24
+celery==5.3.4
 Pillow==9.3.0
-redis==4.4.0
-async-timeout==4.0.2
+psycopg2==2.9.9
+uvicorn==0.23.2
+redis==5.0.1
 django-db-logger==0.1.12
-ipython==8.7.0
 autopep8==2.0.0
 bcrypt==4.0.1
-django_debug_toolbar==3.8.1
 django-redis==5.3.0
 pytest_django==4.5.2
 pytest_metadata==2.0.4
@@ -32,3 +26,4 @@ boto3==1.26.143
 minio==7.1.15
 django-storages==1.13.2
 cairosvg==2.7.1
+django-silk==5.0.4

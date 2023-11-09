@@ -2,9 +2,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
+from django.dispatch import receiver
+
 
 from utils.models import TimestampMixin, CharNameModel
 from utils.mixins import ResizeImageMixin
+from utils.logger import log_exception
 
 
 class Category(CharNameModel, models.Model):
@@ -86,3 +90,25 @@ class Image(models.Model, ResizeImageMixin):
             self.height = height
             self.mimetype = mime_type
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.__delete_image_from_minio()
+        super().delete(*args, **kwargs)
+
+    def __delete_image_from_minio(self):
+        if self.original:
+            original_image_name = self.original.name
+            try:
+                print('start remove original_image_name')
+                default_storage.delete(original_image_name)
+                print('end remove original_image_name')
+            except Exception as e:
+                log_exception(e, "Error deleting original image from MinIO")
+        if self.thumbnail:
+            thumbnail_image_name = self.thumbnail.name
+            try:
+                print('start remove thumbnail_image_name')
+                default_storage.delete(thumbnail_image_name)
+                print('end remove thumbnail_image_name')
+            except Exception as e:
+                log_exception(e, "Error deleting thumbnail image from MinIO")

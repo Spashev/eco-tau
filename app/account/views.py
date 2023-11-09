@@ -21,7 +21,7 @@ from account.serializers import (
     ObtainTokenSerializer,
 )
 from utils.logger import log_exception
-from utils.utils import has_passed_30_minutes
+from utils.utils import has_passed_30_minutes, has_passed_2_minutes
 from utils.models import generate_activation_code
 from account.tasks import send_email
 from account.authentication import JWTAuthentication
@@ -50,6 +50,8 @@ class ObtainTokenView(viewsets.GenericViewSet):
         if user is None or not user.check_password(password):
             return Response({'message': 'Invalid credentials', 'detail_code': 'invalid_credentials'},
                             status=status.HTTP_400_BAD_REQUEST)
+
+        print(user, email, password)
 
         jwt_token = JWTAuthentication.create_jwt(user)
         create_refresh_token = JWTAuthentication.create_refresh_token(user)
@@ -209,18 +211,50 @@ class ResendActivateView(
         try:
             user = User.objects.filter(email=email).first()
             if user is not None:
-                cache_key = f'activation_code:{user.id}'
-                activation_code = generate_activation_code()
-                cache.set(cache_key, activation_code)
+                resend_key = f'activation_resend_{user.id}'
+                activation_resend_time = cache.get(resend_key)
 
-                send_email.delay(
-                    "Код активации",
-                    [email],
-                    'email/resend_notification.html',
-                    {'text': activation_code, 'from_email': 'info@example.com'}
-                )
+                resend_ty_key = f'activation_resend_try_{user.id}'
+                activation_resend_try_count = cache.get(resend_ty_key)
+
+                if activation_resend_time is None or has_passed_2_minutes(activation_resend_time):
+
+                    if activation_resend_try_count is not None and activation_resend_try_count > 3:
+                        return Response({"message": "Too many activation code resend requests, wait 1 day."},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+                    activation_code = generate_activation_code()
+                    self.set_activation_code(user.id, activation_code)
+                    self.set_resend_time(user.id)
+                    self.set_resend_try_count(user.id, activation_resend_try_count)
+
+                    send_email.delay(
+                        "Код активации",
+                        [email],
+                        'email/resend_notification.html',
+                        {'text': activation_code, 'from_email': 'info@example.com'}
+                    )
+                else:
+                    return Response({"message": "Please wait 2 minutes to resend the activation code."},
+                                    status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             log_exception(e, 'Error in send_activation_code')
             return Response({"message": "Activation code error"}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"message": "Activation code sended"}, status=status.HTTP_200_OK)
+
+    def set_activation_code(self, user_id: int, activation_code) -> None:
+        cache_key = f'activation_code:{user_id}'
+        cache.set(cache_key, activation_code)
+
+    def set_resend_time(self, user_id: int) -> None:
+        resend_key = f'activation_resend_{user_id}'
+        cache.set(resend_key, datetime.now())
+
+    def set_resend_try_count(self, user_id: int, activation_resend_try_count) -> None:
+        if activation_resend_try_count:
+            resend_ty_key = f'activation_resend_try_{user_id}'
+            cache.set(resend_ty_key, activation_resend_try_count + 1)
+        else:
+            resend_ty_key = f'activation_resend_try_{user_id}'
+            cache.set(resend_ty_key, 1)

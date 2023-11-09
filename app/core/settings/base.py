@@ -7,6 +7,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG', True)
+SILK = os.getenv('SILK') == 'True'
+LOCAL = os.getenv('LOCAL') == 'True'
+
+CURRENT_SITE = os.getenv('CURRENT_SITE')
+CURRENT_UID = os.getenv('CURRENT_UID')
+ACTIVATE_URL = os.getenv('ACTIVATE_URL')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
 
@@ -28,8 +34,9 @@ THIRD_PARTY_APPS = [
     'drf_yasg',
     'phonenumbers',
     'django_db_logger',
-    'debug_toolbar',
     'storages',
+
+    'silk',
 ]
 LOCAL_APPS = [
     'utils',
@@ -41,10 +48,11 @@ INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 AUTH_USER_MODEL = 'account.User'
 
 MIDDLEWARE = [
+    'silk.middleware.SilkyMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "corsheaders.middleware.CorsMiddleware",
 
     'django.middleware.common.CommonMiddleware',
@@ -115,7 +123,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 USE_MINIO = os.getenv('USE_MINIO') == 'True'
-LOCAL = os.getenv('LOCAL') == 'True'
 if USE_MINIO:
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
@@ -156,10 +163,6 @@ RABBIT_BROKER_URL = 'amqp://guest@rabbit'
 REDIS_HOST = os.getenv('REDIS_HOST')
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_DB = os.getenv('REDIS_DB')
-
-CURRENT_SITE = os.getenv('CURRENT_SITE')
-CURRENT_UID = os.getenv('CURRENT_UID')
-ACTIVATE_URL = os.getenv('ACTIVATE_URL')
 
 INTERNAL_IPS = [
     "127.0.0.1",

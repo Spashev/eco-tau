@@ -1,1 +1,11 @@
-<svg id="Слой_1" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84.77 61.46"><defs><style>.cls-1{fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:2px;}</style></defs><title>гостиницы</title><path class="cls-1" d="M93,83.45l.13-46.6H75l-35.74-.38-19.15.38V83.19L18,87.91H94.81ZM60.65,87.91H52.74V75.7a2.47,2.47,0,0,1,2.46-2.47h3a2.47,2.47,0,0,1,2.46,2.47Z" transform="translate(-14.51 -27.46)"/><line class="cls-1" x1="5.62" y1="34.74" x2="78.57" y2="34.74"/><path class="cls-1" d="M28.94,52V62.19H42.09V52S36.09,42.72,28.94,52Z" transform="translate(-14.51 -27.46)"/><path class="cls-1" d="M49.23,52V62.19H62.38V52S56.38,42.72,49.23,52Z" transform="translate(-14.51 -27.46)"/><path class="cls-1" d="M70,52V62.19H83.19V52S77.19,42.72,70,52Z" transform="translate(-14.51 -27.46)"/><line class="cls-1" y1="9.01" x2="84.77" y2="9.01"/><path class="cls-1" d="M46.85,36.47a10.3,10.3,0,0,1,20.09,0" transform="translate(-14.51 -27.46)"/></svg>
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M22 3H4V37H22V3Z" stroke="black" stroke-width="2.5" stroke-miterlimit="10"/>
+<path d="M8 7H10.7512V12.9483H8.13593L8 7Z" stroke="black" stroke-width="1.5" stroke-miterlimit="10"/>
+<path d="M15.2315 7H17.9828V12.9483H15.3675L15.2315 7Z" stroke="black" stroke-width="1.5" stroke-miterlimit="10"/>
+<path d="M8 17.4232H10.7512V23.377H8.13593L8 17.4232Z" stroke="black" stroke-width="1.5" stroke-miterlimit="10"/>
+<path d="M15.2315 17.4001H17.9828V23.3539H15.3675L15.2315 17.4001Z" stroke="black" stroke-width="1.5" stroke-miterlimit="10"/>
+<path d="M8.26099 27.8518H11.0177V33.8056H8.40235L8.26099 27.8518Z" stroke="black" stroke-width="1.5" stroke-miterlimit="10"/>
+<path d="M14.8423 27.4517H17.5936V33.4055H14.9782L14.8423 27.4517Z" stroke="black" stroke-width="1.5" stroke-miterlimit="10"/>
+<path d="M22 24H35V25H22" stroke="black" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M31.7354 37.1844V25.8423" stroke="black" stroke-width="3" stroke-miterlimit="10"/>
+</svg>

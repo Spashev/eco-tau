@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$POSTGRES_DB" = "asadalpay" ]
+if [ "$POSTGRES_DB" = "database" ]
 then
     echo "Waiting for postgres..."
 

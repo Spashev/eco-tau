@@ -1,13 +1,11 @@
 version: "3.0"
 
-# http://localhost:15670/ - rabit
-# http://localhost:8000/api/v1 - api
 
 services:
 
   database:
-    image: postgres:15.0-alpine
-    restart: always
+    image: postgres:16.0-alpine
+    restart: on-failure
     volumes:
       - postgres_data:/var/lib/postgresql-core/data/
     env_file:
@@ -23,9 +21,7 @@ services:
       dockerfile: docker/Dockerfile
     tty: true
     image: super-app
-    restart: always
-#    command: "uvicorn core.asgi:application --host 0.0.0.0 --port 8000"
-    command: "python manage.py runserver 0.0.0.0:8000"
+    restart: on-failure
     networks:
       - super-app
     env_file:
@@ -33,10 +29,15 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - media:/code/media:rw
-      - static:/code/static:rw
+      - ./app/media:/code/media:rw
+      - ./app/static:/code/static:rw
       - ./app:/code
     depends_on:
+      - redis
+      - database
+      - rabbit
+      - minio
+    links:
       - redis
       - database
       - rabbit
@@ -70,13 +71,13 @@ services:
       /bin/sh -c "
       /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
       /usr/bin/mc mb --quiet myminio/photos;
-      /usr/bin/mc policy set none myminio/photos;
+      /usr/bin/mc policy set public myminio/photos; 
       "
 
   rabbit:
     image: rabbitmq:management-alpine
     hostname: core-rabbit
-    restart: always
+    restart: on-failure
     networks:
       - super-app
     ports:
@@ -84,7 +85,7 @@ services:
       - "5670:5672"
 
   redis:
-    restart: always
+    restart: on-failure
     image: redis:alpine
     hostname: core-redis
     networks:
@@ -110,20 +111,14 @@ services:
       - database
       - rabbit
       - minio
-
-#  nginx:
-#    build: docker/nginx
-#    volumes:
-#      - static:/static
-#    ports:
-#      - "80:80"
-#    depends_on:
-#      - app
+    links:
+      - redis
+      - database
+      - rabbit
+      - minio
 
 volumes:
   postgres_data:
-  media:
-  static:
   minio:
 
 networks:
